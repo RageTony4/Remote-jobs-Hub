@@ -103,12 +103,17 @@
             padding: 1.5rem;
             transition: all 0.3s ease;
             page-break-inside: avoid;
+            display: flex;
+            flex-direction: column;
         }
         .platform-card:hover {
             background: rgba(17, 24, 39, 0.8);
             border-color: var(--glow-color);
             transform: translateY(-2px);
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        .platform-card .card-content {
+             flex-grow: 1;
         }
         .payment-proof-img {
             max-width: 200px;
@@ -138,7 +143,6 @@
             padding: 0.75rem;
             border-radius: 0.5rem;
             width: 100%;
-            max-width: 400px;
         }
         .search-input:focus {
             outline: none;
@@ -159,6 +163,55 @@
             background: rgba(37, 99, 235, 0.1);
             color: var(--glow-color);
         }
+        .filter-container {
+            background: rgba(17, 24, 39, 0.6);
+            border: 1px solid rgba(75, 85, 99, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            align-items: end;
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .filter-label {
+            font-size: 0.875rem;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+            cursor: pointer;
+        }
+        input[type=range]:focus { outline: none; }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            background: #374151;
+            border-radius: 2px;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: var(--glow-color-blue);
+            margin-top: -6px;
+            box-shadow: 0 0 5px var(--glow-color-blue);
+            transition: transform 0.2s ease;
+        }
+         input[type=range]:active::-webkit-slider-thumb {
+            transform: scale(1.2);
+        }
+
         @media print {
             body { background-color: white !important; color: black !important; }
             .platform-card { background: white !important; border: 1px solid #ccc !important; }
@@ -169,7 +222,7 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect } = React;
+        const { useState, useEffect, useMemo } = React;
 
         const App = () => {
             const [activeSection, setActiveSection] = useState('home');
@@ -1642,6 +1695,50 @@
                 ]
             };
 
+            const initialFilterState = {
+                paymentMethod: 'all',
+                region: 'all',
+                maxPayout: 100,
+            };
+            const [filters, setFilters] = useState(initialFilterState);
+
+            const platformsWithPayout = useMemo(() => {
+                const newPlatforms = { ...platforms };
+                for (const categoryId in newPlatforms) {
+                    newPlatforms[categoryId] = newPlatforms[categoryId].map(platform => {
+                        const proofSite = paymentProofSites.find(site => site.name === platform.name);
+                        return {
+                            ...platform,
+                            minPayout: proofSite ? proofSite.minPayout : null,
+                        };
+                    });
+                }
+                return newPlatforms;
+            }, []);
+
+            const parsePayout = (payoutStr) => {
+                if (!payoutStr) return 0;
+                const num = parseFloat(payoutStr.replace(/[^0-9.]/g, ''));
+                return isNaN(num) ? 0 : num;
+            };
+            
+            useEffect(() => {
+                const isCategoryPage = categories.some(cat => cat.id === activeSection);
+                if (isCategoryPage) {
+                     const currentPlatforms = platformsWithPayout[activeSection] || [];
+                     const maxPayoutValue = currentPlatforms.length > 0
+                        ? Math.ceil(Math.max(...currentPlatforms.map(p => parsePayout(p.minPayout)), 0))
+                        : 100;
+
+                    setFilters({
+                        paymentMethod: 'all',
+                        region: 'all',
+                        maxPayout: maxPayoutValue,
+                    });
+                }
+            }, [activeSection, platformsWithPayout]);
+
+
             const filteredSites = paymentProofSites.filter(site => {
                 const matchesSearch = site.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                                     site.description.toLowerCase().includes(searchTerm.toLowerCase());
@@ -1669,12 +1766,14 @@
                             )}
                         </div>
                     </div>
-                    <p className="text-gray-300 mb-3">{site.description}</p>
-                    <div className="mb-3">
-                        <span className="text-sm text-gray-400">Min Payout: </span>
-                        <span className="text-green-400 font-semibold">{site.minPayout}</span>
+                    <div className="card-content">
+                        <p className="text-gray-300 mb-3">{site.description}</p>
+                        <div className="mb-3">
+                            <span className="text-sm text-gray-400">Min Payout: </span>
+                            <span className="text-green-400 font-semibold">{site.minPayout}</span>
+                        </div>
                     </div>
-                    <div className="flex flex-wrap gap-2 mb-4">
+                    <div className="flex flex-wrap gap-2 mt-4">
                         <a 
                             href={site.paymentProof} 
                             target="_blank" 
@@ -1709,12 +1808,14 @@
                             <i className={`${category.icon} text-2xl mr-3`} style={{ color: category.color }}></i>
                             <h2 className="text-2xl font-bold text-white">{category.name}</h2>
                         </div>
-                        <p className="text-gray-300 mb-4">
-                            {categoryPlatforms.length} verified platforms available
-                        </p>
+                        <div className="card-content">
+                            <p className="text-gray-300 mb-4">
+                                {categoryPlatforms.length} verified platforms available
+                            </p>
+                        </div>
                         <button
                             onClick={() => setActiveSection(category.id)}
-                            className="glowing-btn"
+                            className="glowing-btn mt-4"
                             style={{ '--glow-color': category.color }}
                         >
                             Explore Opportunities
@@ -1744,65 +1845,73 @@
                             )}
                         </div>
                     </div>
-                    <p className="text-gray-300 mb-3">{platform.description}</p>
+                    <div className="card-content">
+                        <p className="text-gray-300 mb-3">{platform.description}</p>
                     
-                    <div className="grid grid-cols-2 gap-4 mb-4">
-                        <div>
-                            <span className="text-sm text-gray-400">Pay Rate:</span>
-                            <p className="text-green-400 font-semibold">{platform.payRate}</p>
-                        </div>
-                        <div>
-                            <span className="text-sm text-gray-400">Time:</span>
-                            <p className="text-blue-400 font-semibold">{platform.timeCommitment}</p>
-                        </div>
-                    </div>
-
-                    <div className="mb-4">
-                        <span className="text-sm text-gray-400">Payment Methods:</span>
-                        <div className="flex flex-wrap gap-2 mt-1">
-                            {platform.paymentMethods.map((method, idx) => (
-                                <span key={idx} className="text-xs bg-gray-700 px-2 py-1 rounded text-gray-300">
-                                    {method}
-                                </span>
-                            ))}
-                        </div>
-                    </div>
-
-                    <div className="mb-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-2 mb-4">
                             <div>
-                                <h4 className="text-green-400 font-semibold mb-2">Pros:</h4>
-                                <ul className="text-sm text-gray-300">
-                                    {platform.pros.map((pro, idx) => (
-                                        <li key={idx} className="flex items-start mb-1">
-                                            <i className="fas fa-check text-green-400 mr-2 mt-1 text-xs"></i>
-                                            {pro}
-                                        </li>
-                                    ))}
-                                </ul>
+                                <span className="text-sm text-gray-400">Pay Rate:</span>
+                                <p className="text-green-400 font-semibold">{platform.payRate}</p>
                             </div>
                             <div>
-                                <h4 className="text-red-400 font-semibold mb-2">Cons:</h4>
-                                <ul className="text-sm text-gray-300">
-                                    {platform.cons.map((con, idx) => (
-                                        <li key={idx} className="flex items-start mb-1">
-                                            <i className="fas fa-times text-red-400 mr-2 mt-1 text-xs"></i>
-                                            {con}
-                                        </li>
-                                    ))}
-                                </ul>
+                                <span className="text-sm text-gray-400">Time:</span>
+                                <p className="text-blue-400 font-semibold">{platform.timeCommitment}</p>
                             </div>
+                            {platform.minPayout && (
+                                <div className="col-span-2">
+                                    <span className="text-sm text-gray-400">Min Payout: </span>
+                                    <span className="text-green-400 font-semibold">{platform.minPayout}</span>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="mb-4">
+                            <span className="text-sm text-gray-400">Payment Methods:</span>
+                            <div className="flex flex-wrap gap-2 mt-1">
+                                {platform.paymentMethods.map((method, idx) => (
+                                    <span key={idx} className="text-xs bg-gray-700 px-2 py-1 rounded text-gray-300">
+                                        {method}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="mb-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <h4 className="text-green-400 font-semibold mb-2">Pros:</h4>
+                                    <ul className="text-sm text-gray-300">
+                                        {platform.pros.map((pro, idx) => (
+                                            <li key={idx} className="flex items-start mb-1">
+                                                <i className="fas fa-check text-green-400 mr-2 mt-1 text-xs"></i>
+                                                {pro}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h4 className="text-red-400 font-semibold mb-2">Cons:</h4>
+                                    <ul className="text-sm text-gray-300">
+                                        {platform.cons.map((con, idx) => (
+                                            <li key={idx} className="flex items-start mb-1">
+                                                <i className="fas fa-times text-red-400 mr-2 mt-1 text-xs"></i>
+                                                {con}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="mb-4 p-3 bg-gray-800 rounded">
+                            <h4 className="text-yellow-400 font-semibold mb-2">
+                                <i className="fas fa-lightbulb mr-2"></i>Pro Tips:
+                            </h4>
+                            <p className="text-sm text-gray-300">{platform.tips}</p>
                         </div>
                     </div>
 
-                    <div className="mb-4 p-3 bg-gray-800 rounded">
-                        <h4 className="text-yellow-400 font-semibold mb-2">
-                            <i className="fas fa-lightbulb mr-2"></i>Pro Tips:
-                        </h4>
-                        <p className="text-sm text-gray-300">{platform.tips}</p>
-                    </div>
-
-                    <div className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-3 mt-auto pt-4 border-t border-gray-700/50">
                         <div className="text-xs text-gray-400">
                             <strong>Requirements:</strong> {platform.requirements}
                         </div>
@@ -1942,7 +2051,7 @@
                                 <input
                                     type="text"
                                     placeholder="Search platforms..."
-                                    className="search-input"
+                                    className="search-input max-w-md"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
@@ -1998,7 +2107,24 @@
 
                 // Individual category pages
                 const currentCategory = categories.find(cat => cat.id === activeSection);
-                if (currentCategory && platforms[activeSection]) {
+                if (currentCategory && platformsWithPayout[activeSection]) {
+                    const currentPlatforms = platformsWithPayout[activeSection] || [];
+                    
+                    const filteredPlatforms = currentPlatforms.filter(platform => {
+                        const paymentMatch = filters.paymentMethod === 'all' || platform.paymentMethods.includes(filters.paymentMethod);
+                        const regionMatch = filters.region === 'all' ||
+                            (filters.region === 'global' && platform.requirements.toLowerCase().includes('global')) ||
+                            (filters.region === 'us' && (platform.requirements.toLowerCase().includes('us') || platform.requirements.toLowerCase().includes('canada')));
+                        const payoutVal = parsePayout(platform.minPayout);
+                        const payoutMatch = payoutVal <= filters.maxPayout;
+                        return paymentMatch && regionMatch && payoutMatch;
+                    });
+
+                    const uniquePaymentMethods = [...new Set(currentPlatforms.flatMap(p => p.paymentMethods))].sort();
+                    const maxPayoutValue = currentPlatforms.length > 0
+                        ? Math.ceil(Math.max(...currentPlatforms.map(p => parsePayout(p.minPayout)), 0))
+                        : 100;
+                    
                     return (
                         <div>
                             <div className="text-center mb-12">
@@ -2020,14 +2146,60 @@
                                 </button>
                             </div>
 
+                            <div className="filter-container">
+                                <div className="filter-group">
+                                    <label htmlFor="paymentMethodFilter" className="filter-label">Payment Method</label>
+                                    <select 
+                                        id="paymentMethodFilter" 
+                                        className="search-input" 
+                                        value={filters.paymentMethod} 
+                                        onChange={e => setFilters(prev => ({ ...prev, paymentMethod: e.target.value }))}
+                                    >
+                                        <option value="all">All Methods</option>
+                                        {uniquePaymentMethods.map(method => (
+                                            <option key={method} value={method}>{method}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="filter-group">
+                                    <label htmlFor="regionFilter" className="filter-label">Region</label>
+                                    <select 
+                                        id="regionFilter" 
+                                        className="search-input" 
+                                        value={filters.region} 
+                                        onChange={e => setFilters(prev => ({ ...prev, region: e.target.value }))}
+                                    >
+                                        <option value="all">All Regions</option>
+                                        <option value="global">Global Focus</option>
+                                        <option value="us">US/CA Focus</option>
+                                    </select>
+                                </div>
+                                <div className="filter-group w-full min-w-[200px]">
+                                    <label htmlFor="payoutFilter" className="filter-label flex justify-between">
+                                        <span>Min Payout</span>
+                                        <span className="text-white font-semibold">${filters.maxPayout} or less</span>
+                                    </label>
+                                    <input 
+                                        type="range" 
+                                        id="payoutFilter" 
+                                        min="0" 
+                                        max={maxPayoutValue}
+                                        step="1"
+                                        value={filters.maxPayout} 
+                                        onChange={e => setFilters(prev => ({ ...prev, maxPayout: parseInt(e.target.value, 10) }))}
+                                    />
+                                </div>
+                            </div>
+
+
                             <div className="mb-8 text-center">
                                 <p className="text-gray-400">
-                                    <span className="text-white font-semibold">{platforms[activeSection].length}</span> verified platforms in this category
+                                    Showing <span className="text-white font-semibold">{filteredPlatforms.length}</span> of {currentPlatforms.length} platforms
                                 </p>
                             </div>
 
                             <div className="category-grid">
-                                {platforms[activeSection].map((platform, index) => (
+                                {filteredPlatforms.map((platform, index) => (
                                     <PlatformCard key={index} platform={platform} />
                                 ))}
                             </div>
@@ -2066,7 +2238,7 @@
                                         <i className="fas fa-receipt mr-2"></i>Payment Proofs
                                     </span>
                                     <span 
-                                        className={`nav-item ${activeSection === 'categories' ? 'active' : ''}`}
+                                        className={`nav-item ${activeSection === 'categories' || categories.some(c => c.id === activeSection) ? 'active' : ''}`}
                                         onClick={() => setActiveSection('categories')}
                                     >
                                         <i className="fas fa-th-large mr-2"></i>Categories
