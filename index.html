@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
@@ -757,19 +758,6 @@
                                 <p className="text-xl text-gray-300 max-w-4xl mx-auto mb-8">
                                     Thoroughly vetted platforms for {currentCategory.name.toLowerCase()}. All maintain high quality ratings and have verified payment records from real users.
                                 </p>
-                                {currentCategory.id === 'chat-moderation' && (
-                                    <div className="warning-box max-w-4xl mx-auto mb-8">
-                                        <h3 className="text-lg font-bold text-red-400 mb-2">
-                                            <i className="fas fa-exclamation-triangle mr-2"></i>WARNING: Platforms Added Per User Request
-                                        </h3>
-                                        <p className="text-gray-300 text-sm mb-2">
-                                            The platforms Cloudworkers and e-Moderators have been added at user request despite poor reviews and ratings. These platforms have numerous complaints about payment issues, account suspensions, and questionable business practices.
-                                        </p>
-                                        <p className="text-yellow-200 text-sm font-semibold">
-                                            We strongly recommend using the higher-rated platforms (Chat-From-Home, TexKings, LiveWorld, ModSquad) instead.
-                                        </p>
-                                    </div>
-                                )}
                                 <button onClick={() => setActiveSection('categories')} className="glowing-btn mb-8" style={{ '--glow-color': currentCategory.color }}>
                                     <i className="fas fa-arrow-left mr-2"></i>Back to Categories
                                 </button>
