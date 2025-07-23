@@ -770,6 +770,87 @@
                     );
                 }
 
+                if (activeSection === 'privacy-policy') {
+                    return (
+                        <div className="max-w-4xl mx-auto text-gray-300 prose prose-invert prose-lg">
+                            <button onClick={() => setActiveSection('home')} className="glowing-btn mb-8" style={{'--glow-color': 'var(--glow-color-blue)'}}>
+                                <i className="fas fa-arrow-left mr-2"></i>Back to Home
+                            </button>
+                            <h1 className="text-4xl font-bold mb-6 text-blue-400">Privacy Policy</h1>
+                            <p className="text-gray-400">Last Updated: October 2025</p>
+                            <p>Welcome to Remote Work Hub 2025 ("we", "us", "our"). We are committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website.</p>
+                            
+                            <h2 className="text-2xl font-bold mt-8 mb-4 text-purple-400">Information We Collect</h2>
+                            <p>We may collect information about you in a variety of ways. The information we may collect on the Site includes:</p>
+                            <ul>
+                                <li><strong>Derivative Data:</strong> Information our servers automatically collect when you access the Site, such as your IP address, browser type, operating system, access times, and the pages you have viewed directly before and after accessing the Site.</li>
+                                <li><strong>Third-Party Data:</strong> We use third-party services like Ko-fi for support and Telegram for communication. Any information you provide to these services is subject to their respective privacy policies.</li>
+                            </ul>
+
+                            <h2 className="text-2xl font-bold mt-8 mb-4 text-purple-400">Use of Your Information</h2>
+                            <p>Having accurate information about you permits us to provide you with a smooth, efficient, and customized experience. Specifically, we may use information collected about you via the Site to:</p>
+                            <ul>
+                                <li>Analyze usage and trends to improve our website and your experience.</li>
+                                <li>Monitor and analyze usage and trends to improve the quality of our recommendations.</li>
+                                <li>Maintain the security and operation of our website.</li>
+                            </ul>
+
+                            <h2 className="text-2xl font-bold mt-8 mb-4 text-purple-400">Affiliate Links and Cookies</h2>
+                            <p>This website uses affiliate links. If you click on an affiliate link and make a purchase or sign up, we may receive a commission at no extra cost to you. These links may use cookies to track your activity for commission purposes. By using this site, you consent to the use of these cookies.</p>
+
+                            <h2 className="text-2xl font-bold mt-8 mb-4 text-purple-400">Third-Party Websites</h2>
+                            <p>The Site contains links to third-party websites and applications of interest, including advertisements and external services, that are not affiliated with us. Once you have used these links to leave the Site, any information you provide to these third parties is not covered by this Privacy Policy, and we cannot guarantee the safety and privacy of your information.</p>
+                             
+                            <h2 className="text-2xl font-bold mt-8 mb-4 text-purple-400">Security of Your Information</h2>
+                            <p>We use administrative, technical, and physical security measures to help protect your personal information. While we have taken reasonable steps to secure the personal information you provide to us, please be aware that despite our efforts, no security measures are perfect or impenetrable, and no method of data transmission can be guaranteed against any interception or other type of misuse.</p>
+
+                            <h2 className="text-2xl font-bold mt-8 mb-4 text-purple-400">Contact Us</h2>
+                            <p>If you have questions or comments about this Privacy Policy, please contact us via Telegram at @Sammarkey4.</p>
+                        </div>
+                    );
+                }
+
+                if (activeSection === 'terms-of-service') {
+                    return (
+                        <div className="max-w-4xl mx-auto text-gray-300 prose prose-invert prose-lg">
+                            <button onClick={() => setActiveSection('home')} className="glowing-btn mb-8" style={{'--glow-color': 'var(--glow-color-blue)'}}>
+                                <i className="fas fa-arrow-left mr-2"></i>Back to Home
+                            </button>
+                            <h1 className="text-4xl font-bold mb-6 text-blue-400">Terms of Service</h1>
+                            <p className="text-gray-400">Last Updated: October 2025</p>
+                            <p>By accessing and using Remote Work Hub 2025 (the "Site"), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the below, please do not use this service.</p>
+                            
+                            <h2 className="text-2xl font-bold mt-8 mb-4 text-purple-400">Disclaimers and Limitation of Liability</h2>
+                            <p>The information on this Site is provided for general information purposes only. You must read and agree to the following disclaimers:</p>
+
+                            <div className="bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-4 my-4">
+                                <h3 className="text-xl font-bold text-yellow-300 mb-2">Affiliate Disclosure</h3>
+                                <p className="text-yellow-200">This Site contains affiliate links. This means that if you click on a link and sign up for a service or make a purchase, we may receive a commission at no additional cost to you. We only recommend platforms we believe are of high quality, but our recommendations are influenced by these affiliate relationships.</p>
+                            </div>
+
+                            <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4 my-4">
+                                <h3 className="text-xl font-bold text-red-300 mb-2">Earnings Disclaimer</h3>
+                                <p className="text-red-200">This Site makes no guarantees about your ability to get earnings with the platforms, ideas, information, tools, or strategies mentioned. All earning potentials, pay rates, and payment proofs are examples and estimates. Your results may vary and will be based on your individual capacity, experience, and level of desire. There are no guarantees concerning the level of success you may experience.</p>
+                            </div>
+
+                            <ul>
+                                <li><strong>Accuracy of Information:</strong> While we strive to provide accurate and up-to-date information, we make no representations or warranties of any kind, express or implied, about the completeness, accuracy, reliability, or availability of any information, products, or services on the Site. Any reliance you place on such information is strictly at your own risk.</li>
+                                <li><strong>Third-Party Links:</strong> We are not responsible for the content, policies, or practices of any third-party websites linked to on this Site. We encourage you to review the terms and privacy policies of any third-party sites you visit.</li>
+                                <li><strong>No Professional Advice:</strong> The content on this site is not a substitute for professional financial, legal, or tax advice. Always seek the advice of a qualified professional with any questions you may have.</li>
+                            </ul>
+
+                            <h2 className="text-2xl font-bold mt-8 mb-4 text-purple-400">Intellectual Property</h2>
+                            <p>The Site and its original content, features, and functionality are owned by the Site operator and are protected by international copyright, trademark, and other intellectual property or proprietary rights laws.</p>
+
+                            <h2 className="text-2xl font-bold mt-8 mb-4 text-purple-400">Changes to Terms</h2>
+                            <p>We reserve the right to modify these terms at any time. We do so by posting and drawing attention to the updated terms on the Site. Your decision to continue to visit and make use of the Site after such changes have been made constitutes your formal acceptance of the new Terms of Service.</p>
+
+                            <h2 className="text-2xl font-bold mt-8 mb-4 text-purple-400">Contact Us</h2>
+                            <p>If you have any questions about this Agreement, please feel free to contact us via Telegram at @Sammarkey4.</p>
+                        </div>
+                    );
+                }
+
                 if (currentCategory) {
                     return (
                         <div>
@@ -911,11 +992,15 @@
                                 </div>
                             </div>
                             <div className="border-t border-gray-700 pt-8 text-center">
+                                <div className="flex justify-center gap-6 mb-4">
+                                    <span onClick={() => setActiveSection('terms-of-service')} className="text-gray-400 hover:text-white cursor-pointer transition-colors text-sm">Terms of Service</span>
+                                    <span onClick={() => setActiveSection('privacy-policy')} className="text-gray-400 hover:text-white cursor-pointer transition-colors text-sm">Privacy Policy</span>
+                                </div>
                                 <p className="text-gray-400 mb-2">
                                     © 2025 Remote Work Hub. All platforms thoroughly researched and verified across multiple review sources.
                                 </p>
                                 <p className="text-sm text-gray-500">
-                                    Always research platforms independently and read terms of service before signing up. 
+                                    This site includes affiliate links and is for informational purposes only. It is not financial or legal advice. 
                                     Earnings may vary based on location, time invested, and individual circumstances.
                                 </p>
                                 <div className="mt-4 flex flex-col md:flex-row items-center justify-center gap-4">
