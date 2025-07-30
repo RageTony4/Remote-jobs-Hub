@@ -120,6 +120,7 @@
             transition: all 0.3s ease;
             padding: 0.5rem 1rem;
             border-radius: 0.5rem;
+            position: relative;
         }
         .nav-item:hover {
             background: rgba(37, 99, 235, 0.1);
@@ -474,6 +475,10 @@
                 });
             };
 
+            const handleClearCompare = () => {
+                setCompareList([]);
+            };
+
             const handleFavoriteToggle = (platformName) => {
                 setFavoritesList(prevList => {
                     if (prevList.includes(platformName)) {
@@ -757,39 +762,6 @@
                 return <p className="text-gray-300">{data || 'N/A'}</p>;
             };
 
-            const CompareBar = () => (
-                <div className="fixed bottom-0 left-0 right-0 bg-gray-900 bg-opacity-80 backdrop-blur-md p-4 z-50 border-t border-gray-700 shadow-lg">
-                    <div className="container mx-auto flex flex-wrap items-center justify-between gap-4">
-                        <div className="flex-grow">
-                            <h3 className="text-lg font-bold text-white">Comparison List ({compareList.length}/3)</h3>
-                            <div className="flex flex-wrap gap-2 mt-2">
-                                {compareList.map(p => (
-                                    <span key={p.name} className="flex items-center bg-gray-700 text-gray-200 text-sm px-3 py-1 rounded-full">
-                                        {p.name}
-                                        <button onClick={() => handleCompareToggle(p)} className="ml-2 text-gray-400 hover:text-white">
-                                            <i className="fas fa-times-circle"></i>
-                                        </button>
-                                    </span>
-                                ))}
-                                 {compareList.length === 0 && <p className="text-sm text-gray-400">Select platforms with the <i className="fas fa-plus-circle text-xs"></i> button to compare.</p>}
-                            </div>
-                        </div>
-                        <div className="flex gap-4">
-                            <button onClick={() => setCompareList([])} className="glowing-btn text-sm" style={{'--glow-color': 'hsl(0, 80%, 70%)'}}>
-                                <i className="fas fa-trash mr-2"></i>Clear
-                            </button>
-                            <button 
-                                onClick={() => setActiveSection('compare')} 
-                                disabled={compareList.length < 2}
-                                className="glowing-btn text-sm disabled:opacity-50 disabled:cursor-not-allowed" 
-                                style={{'--glow-color': 'hsl(140, 100%, 70%)'}}>
-                                <i className="fas fa-balance-scale mr-2"></i>Compare ({compareList.length})
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            );
-
             // MAIN RENDER LOGIC
             const renderContent = () => {
                 if (activeSection === 'home') {
@@ -1061,6 +1033,24 @@
                 }
                 
                 if (activeSection === 'compare') {
+                    if (compareList.length < 2) {
+                        return (
+                            <div>
+                                <div className="text-center mb-12">
+                                     <h1 className="text-4xl md:text-5xl font-bold text-center mb-6 bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent">Platform Comparison</h1>
+                                     <button onClick={() => setActiveSection(lastActiveSection)} className="glowing-btn" style={{'--glow-color': 'var(--glow-color-blue)'}}>
+                                        <i className="fas fa-arrow-left mr-2"></i>Back
+                                    </button>
+                                </div>
+                                <div className="text-center text-gray-400 py-16 bg-gray-800/20 rounded-lg">
+                                    <i className="fas fa-balance-scale text-6xl mb-4 text-gray-500"></i>
+                                    <p className="text-2xl font-semibold text-white">Please select at least 2 platforms to compare.</p>
+                                    <p className="mt-2">You currently have {compareList.length} platform(s) selected. Use the "Add to Compare" button on any platform card.</p>
+                                </div>
+                            </div>
+                        );
+                    }
+            
                     const features = [
                         { key: 'rating', label: 'Rating', icon: 'fas fa-star' },
                         { key: 'payRate', label: 'Pay Rate', icon: 'fas fa-dollar-sign' },
@@ -1075,17 +1065,25 @@
             
                     return (
                         <div>
-                            <button onClick={() => setActiveSection(lastActiveSection)} className="glowing-btn mb-8" style={{'--glow-color': 'var(--glow-color-blue)'}}>
-                                <i className="fas fa-arrow-left mr-2"></i>Back
-                            </button>
-                            <h1 className="text-4xl md:text-5xl font-bold text-center mb-12 bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent">Platform Comparison</h1>
+                            <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+                                <button onClick={() => setActiveSection(lastActiveSection)} className="glowing-btn" style={{'--glow-color': 'var(--glow-color-blue)'}}>
+                                    <i className="fas fa-arrow-left mr-2"></i>Back to Platforms
+                                </button>
+                                 <h1 className="text-4xl md:text-5xl font-bold text-center bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent order-first md:order-none">Platform Comparison</h1>
+                                <button onClick={handleClearCompare} className="glowing-btn" style={{'--glow-color': 'hsl(0, 80%, 70%)'}}>
+                                    <i className="fas fa-trash mr-2"></i>Clear All
+                                </button>
+                            </div>
                             <div className="overflow-x-auto">
                                 <div className="comparison-grid" style={{ gridTemplateColumns: `180px repeat(${compareList.length}, 1fr)` }}>
                                     {/* Header Row */}
                                     <div className="comparison-cell header-cell">Feature</div>
                                     {compareList.map(platform => (
-                                        <div key={platform.name} className="comparison-cell header-cell text-center">
-                                            <h2 className="text-2xl font-bold">{platform.name}</h2>
+                                        <div key={platform.name} className="comparison-cell header-cell text-center relative">
+                                            <button onClick={() => handleCompareToggle(platform)} className="absolute top-2 right-2 text-gray-400 hover:text-red-400 transition-colors" title={`Remove ${platform.name} from comparison`}>
+                                                <i className="fas fa-times-circle"></i>
+                                            </button>
+                                            <h2 className="text-2xl font-bold mt-4">{platform.name}</h2>
                                         </div>
                                     ))}
             
@@ -1199,7 +1197,7 @@
                                 <div className="text-2xl font-bold cursor-pointer" onClick={() => handleNavigation('home')}>
                                     <i className="fas fa-laptop-house text-blue-400 mr-2"></i>RemoteHub2025
                                 </div>
-                                <div className="flex flex-wrap items-center gap-4">
+                                <div className="flex flex-wrap items-center gap-2 md:gap-4">
                                     <span className={`nav-item ${activeSection === 'home' ? 'active' : ''}`} onClick={() => handleNavigation('home')}>
                                         <i className="fas fa-home mr-2"></i>Home
                                     </span>
@@ -1211,6 +1209,14 @@
                                     </span>
                                      <span className={`nav-item ${activeSection === 'favorites' ? 'active' : ''}`} onClick={() => handleNavigation('favorites')}>
                                         <i className="fas fa-star mr-2"></i>My Favorites
+                                    </span>
+                                    <span className={`nav-item ${activeSection === 'compare' ? 'active' : ''}`} onClick={() => handleNavigation('compare')}>
+                                        <i className="fas fa-balance-scale mr-2"></i>Compare
+                                        {compareList.length > 0 && (
+                                            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center border-2 border-gray-900">
+                                                {compareList.length}
+                                            </span>
+                                        )}
                                     </span>
                                 </div>
                             </div>
@@ -1296,7 +1302,6 @@
                             </div>
                         </div>
                     </footer>
-                    {(currentCategory || activeSection === 'favorites') && <CompareBar />}
                 </div>
             );
         };
