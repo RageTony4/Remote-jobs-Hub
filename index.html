@@ -175,6 +175,45 @@
             padding: 1rem;
             margin: 1rem 0;
         }
+        .disabled\:opacity-50:disabled {
+            opacity: 0.5;
+        }
+        .disabled\:cursor-not-allowed:disabled {
+            cursor: not-allowed;
+        }
+        .compared-active {
+            --glow-color: hsl(100, 100%, 70%);
+            background-color: hsla(100, 100%, 50%, 0.1);
+        }
+        .comparison-grid {
+            display: grid;
+            gap: 1px;
+            background-color: rgba(75, 85, 99, 0.3);
+            border: 1px solid rgba(75, 85, 99, 0.3);
+            border-radius: 12px;
+            overflow: hidden;
+            min-width: 800px;
+        }
+        .comparison-cell {
+            background: rgba(17, 24, 39, 0.8);
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .comparison-cell.header-cell {
+            background: rgba(31, 41, 55, 0.9);
+            color: white;
+            font-weight: bold;
+        }
+        .comparison-cell.label-cell {
+            background: rgba(31, 41, 55, 0.9);
+            color: #d1d5db;
+            font-weight: 600;
+            position: sticky;
+            left: 0;
+            z-index: 10;
+        }
         @media print {
             body { background-color: white !important; color: black !important; }
             .platform-card { background: white !important; border: 1px solid #ccc !important; }
@@ -189,6 +228,8 @@
         const App = () => {
             // STATE HOOKS
             const [activeSection, setActiveSection] = useState('home');
+            const [lastActiveSection, setLastActiveSection] = useState('home');
+            const [compareList, setCompareList] = useState([]);
             const [proofFilters, setProofFilters] = useState({
                 searchTerm: '',
                 category: 'all',
@@ -201,7 +242,12 @@
                 minRating: 3.5
             });
 
-            // STATIC DATA - Updated with new platforms and removed low-rated ones
+            // Scroll to top on section change
+            useEffect(() => {
+                window.scrollTo(0, 0);
+            }, [activeSection]);
+
+            // STATIC DATA
             const paymentProofSites = [
                 // Top Survey/GPT Sites - Updated (removed low-rated platforms)
                 { name: "FreeCash", category: "Survey/GPT", paymentProof: "https://i.imgur.com/bk8tonH.png", description: "Multiple earning methods with crypto options and high payouts", minCashout: "$5", trustpilot: "https://www.trustpilot.com/review/freecash.com", rating: "4.6/5" },
@@ -391,6 +437,28 @@
                 return match ? parseFloat(match[0]) : 0;
             };
 
+            const handleNavigation = (section) => {
+                setActiveSection(section);
+                if (!['terms-of-service', 'privacy-policy', 'compare'].includes(section)) {
+                    setLastActiveSection(section);
+                }
+            };
+            
+            const handleCompareToggle = (platformToToggle) => {
+                setCompareList(prevList => {
+                    const isInList = prevList.some(p => p.name === platformToToggle.name);
+                    if (isInList) {
+                        return prevList.filter(p => p.name !== platformToToggle.name);
+                    } else {
+                        if (prevList.length < 3) {
+                            return [...prevList, platformToToggle];
+                        }
+                        alert("You can compare a maximum of 3 platforms at a time.");
+                        return prevList;
+                    }
+                });
+            };
+
             const sortedPaymentProofSites = useMemo(() => {
                 return [...paymentProofSites].sort((a, b) => parseRating(b.rating) - parseRating(a.rating));
             }, []);
@@ -505,106 +573,177 @@
                         <div className="card-content">
                             <p className="text-gray-300 mb-4">{categoryPlatforms.length} verified platforms available</p>
                         </div>
-                        <button onClick={() => setActiveSection(category.id)} className="glowing-btn mt-4" style={{ '--glow-color': category.color }}>
+                        <button onClick={() => handleNavigation(category.id)} className="glowing-btn mt-4" style={{ '--glow-color': category.color }}>
                             Explore Opportunities
                         </button>
                     </div>
                 );
             };
 
-            const PlatformCard = ({ platform }) => (
-                <div className="platform-card">
-                    <div className="flex justify-between items-start mb-3">
-                        <h3 className="text-xl font-bold text-white">{platform.name}</h3>
-                        <div className="flex flex-col items-end">
-                            <span className={`text-xs px-2 py-1 rounded mb-1 ${platform.difficulty === 'Beginner' ? 'bg-green-600 text-green-100' : platform.difficulty === 'Intermediate' ? 'bg-yellow-600 text-yellow-100' : platform.difficulty === 'Advanced' ? 'bg-red-600 text-red-100' : platform.difficulty === 'Expert' ? 'bg-purple-600 text-purple-100' : 'bg-gray-600 text-gray-100'}`}>
-                                {platform.difficulty}
-                            </span>
-                            {platform.rating && <span className="text-xs text-yellow-400">⭐ {platform.rating}</span>}
+            const PlatformCard = ({ platform }) => {
+                const isCompared = compareList.some(p => p.name === platform.name);
+                return (
+                    <div className="platform-card">
+                        <div className="flex justify-between items-start mb-3">
+                            <h3 className="text-xl font-bold text-white">{platform.name}</h3>
+                            <div className="flex flex-col items-end">
+                                <span className={`text-xs px-2 py-1 rounded mb-1 ${platform.difficulty === 'Beginner' ? 'bg-green-600 text-green-100' : platform.difficulty === 'Intermediate' ? 'bg-yellow-600 text-yellow-100' : platform.difficulty === 'Advanced' ? 'bg-red-600 text-red-100' : platform.difficulty === 'Expert' ? 'bg-purple-600 text-purple-100' : 'bg-gray-600 text-gray-100'}`}>
+                                    {platform.difficulty}
+                                </span>
+                                {platform.rating && <span className="text-xs text-yellow-400">⭐ {platform.rating}</span>}
+                            </div>
                         </div>
-                    </div>
-                    <div className="card-content">
-                        {platform.warning && (
-                            <div className="bg-red-900/30 border border-red-500/50 rounded-lg p-3 mb-3 text-sm text-red-200">
-                                <strong className="font-bold block mb-1">🚩 HIGH-RISK WARNING</strong>
-                                <p>{platform.warning}</p>
-                            </div>
-                        )}
-                        {platform.caution && (
-                            <div className="bg-yellow-900/30 border border-yellow-500/50 rounded-lg p-3 mb-3 text-sm text-yellow-200">
-                                <strong className="font-bold block mb-1">⚠️ CAUTION</strong>
-                                <p>{platform.caution}</p>
-                            </div>
-                        )}
-                        <p className="text-gray-300 mb-3">{platform.description}</p>
-                        <div className="grid grid-cols-2 gap-x-4 gap-y-2 mb-4">
-                            <div>
-                                <span className="text-sm text-gray-400">Pay Rate:</span>
-                                <p className="text-green-400 font-semibold">{platform.payRate}</p>
-                            </div>
-                            <div>
-                                <span className="text-sm text-gray-400">Time:</span>
-                                <p className="text-blue-400 font-semibold">{platform.timeCommitment}</p>
-                            </div>
-                            {platform.minCashout && (
-                                <div className="col-span-2">
-                                    <span className="text-sm text-gray-400">Minimum Cashout: </span>
-                                    <span className="text-green-400 font-semibold">{platform.minCashout}</span>
+                        <div className="card-content">
+                            {platform.warning && (
+                                <div className="bg-red-900/30 border border-red-500/50 rounded-lg p-3 mb-3 text-sm text-red-200">
+                                    <strong className="font-bold block mb-1">🚩 HIGH-RISK WARNING</strong>
+                                    <p>{platform.warning}</p>
                                 </div>
                             )}
+                            {platform.caution && (
+                                <div className="bg-yellow-900/30 border border-yellow-500/50 rounded-lg p-3 mb-3 text-sm text-yellow-200">
+                                    <strong className="font-bold block mb-1">⚠️ CAUTION</strong>
+                                    <p>{platform.caution}</p>
+                                </div>
+                            )}
+                            <p className="text-gray-300 mb-3">{platform.description}</p>
+                            <div className="grid grid-cols-2 gap-x-4 gap-y-2 mb-4">
+                                <div>
+                                    <span className="text-sm text-gray-400">Pay Rate:</span>
+                                    <p className="text-green-400 font-semibold">{platform.payRate}</p>
+                                </div>
+                                <div>
+                                    <span className="text-sm text-gray-400">Time:</span>
+                                    <p className="text-blue-400 font-semibold">{platform.timeCommitment}</p>
+                                </div>
+                                {platform.minCashout && (
+                                    <div className="col-span-2">
+                                        <span className="text-sm text-gray-400">Minimum Cashout: </span>
+                                        <span className="text-green-400 font-semibold">{platform.minCashout}</span>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="mb-4">
+                                <span className="text-sm text-gray-400">Payment Methods:</span>
+                                <div className="flex flex-wrap gap-2 mt-1">
+                                    {platform.paymentMethods.map((method, idx) => (
+                                        <span key={idx} className="text-xs bg-gray-700 px-2 py-1 rounded text-gray-300">{method}</span>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="mb-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <h4 className="text-green-400 font-semibold mb-2">Pros:</h4>
+                                        <ul className="text-sm text-gray-300">
+                                            {platform.pros.map((pro, idx) => (
+                                                <li key={idx} className="flex items-start mb-1">
+                                                    <i className="fas fa-check text-green-400 mr-2 mt-1 text-xs"></i>{pro}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <h4 className="text-red-400 font-semibold mb-2">Cons:</h4>
+                                        <ul className="text-sm text-gray-300">
+                                            {platform.cons.map((con, idx) => (
+                                                <li key={idx} className="flex items-start mb-1">
+                                                    <i className="fas fa-times text-red-400 mr-2 mt-1 text-xs"></i>{con}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="mb-4 p-3 bg-gray-800 rounded">
+                                <h4 className="text-yellow-400 font-semibold mb-2">
+                                    <i className="fas fa-lightbulb mr-2"></i>Pro Tips:
+                                </h4>
+                                <p className="text-sm text-gray-300">{platform.tips}</p>
+                            </div>
                         </div>
-                        <div className="mb-4">
-                            <span className="text-sm text-gray-400">Payment Methods:</span>
-                            <div className="flex flex-wrap gap-2 mt-1">
-                                {platform.paymentMethods.map((method, idx) => (
-                                    <span key={idx} className="text-xs bg-gray-700 px-2 py-1 rounded text-gray-300">{method}</span>
+                        <div className="flex flex-col gap-3 mt-auto pt-4 border-t border-gray-700/50">
+                            <div className="text-xs text-gray-400">
+                                <strong>Requirements:</strong> {platform.requirements}
+                            </div>
+                            <div className="flex flex-col gap-2">
+                                <div className="flex flex-wrap gap-2">
+                                    <a href={platform.url} target="_blank" rel="noopener noreferrer" className="glowing-btn text-sm flex-grow text-center" style={{ '--glow-color': 'var(--glow-color-blue)' }}>
+                                        <i className="fas fa-external-link-alt mr-2"></i>Apply Now
+                                    </a>
+                                    {platform.trustpilot && (
+                                        <a href={platform.trustpilot} target="_blank" rel="noopener noreferrer" className="glowing-btn text-sm flex-grow text-center" style={{ '--glow-color': 'hsl(50, 100%, 70%)' }}>
+                                            <i className="fas fa-star mr-2"></i>Reviews
+                                        </a>
+                                    )}
+                                </div>
+                                <button onClick={() => handleCompareToggle(platform)} className={`glowing-btn text-sm w-full ${isCompared ? 'compared-active' : ''}`} style={{ '--glow-color': isCompared ? 'hsl(100, 100%, 70%)' : 'hsl(200, 100%, 70%)' }}>
+                                    <i className={`fas ${isCompared ? 'fa-check-circle' : 'fa-plus-circle'} mr-2`}></i>
+                                    {isCompared ? 'Added to Compare' : 'Add to Compare'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )
+            };
+            
+            const renderComparisonData = (platform, key) => {
+                const data = platform[key];
+                if (Array.isArray(data)) {
+                    if (key === 'pros' || key === 'cons') {
+                        return (
+                            <ul className="text-sm list-none p-0 m-0">
+                                {data.map((item, idx) => (
+                                    <li key={idx} className="flex items-start mb-1">
+                                        <i className={`fas ${key === 'pros' ? 'fa-check text-green-400' : 'fa-times text-red-400'} mr-2 mt-1 text-xs`}></i>{item}
+                                    </li>
                                 ))}
+                            </ul>
+                        );
+                    }
+                    return (
+                        <div className="flex flex-wrap gap-1">
+                            {data.map((item, idx) => <span key={idx} className="text-xs bg-gray-700 px-2 py-1 rounded text-gray-300">{item}</span>)}
+                        </div>
+                    );
+                }
+                if (key === 'rating') {
+                    return <span className="font-bold text-yellow-400">⭐ {data}</span>
+                }
+                if (key === 'payRate' || key === 'minCashout') {
+                     return <span className="font-semibold text-green-400">{data}</span>
+                }
+                return <p className="text-gray-300">{data || 'N/A'}</p>;
+            };
+
+            const CompareBar = () => (
+                <div className="fixed bottom-0 left-0 right-0 bg-gray-900 bg-opacity-80 backdrop-blur-md p-4 z-50 border-t border-gray-700 shadow-lg">
+                    <div className="container mx-auto flex flex-wrap items-center justify-between gap-4">
+                        <div className="flex-grow">
+                            <h3 className="text-lg font-bold text-white">Comparison List ({compareList.length}/3)</h3>
+                            <div className="flex flex-wrap gap-2 mt-2">
+                                {compareList.map(p => (
+                                    <span key={p.name} className="flex items-center bg-gray-700 text-gray-200 text-sm px-3 py-1 rounded-full">
+                                        {p.name}
+                                        <button onClick={() => handleCompareToggle(p)} className="ml-2 text-gray-400 hover:text-white">
+                                            <i className="fas fa-times-circle"></i>
+                                        </button>
+                                    </span>
+                                ))}
+                                 {compareList.length === 0 && <p className="text-sm text-gray-400">Select platforms with the <i className="fas fa-plus-circle text-xs"></i> button to compare.</p>}
                             </div>
                         </div>
-                        <div className="mb-4">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <h4 className="text-green-400 font-semibold mb-2">Pros:</h4>
-                                    <ul className="text-sm text-gray-300">
-                                        {platform.pros.map((pro, idx) => (
-                                            <li key={idx} className="flex items-start mb-1">
-                                                <i className="fas fa-check text-green-400 mr-2 mt-1 text-xs"></i>{pro}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                                <div>
-                                    <h4 className="text-red-400 font-semibold mb-2">Cons:</h4>
-                                    <ul className="text-sm text-gray-300">
-                                        {platform.cons.map((con, idx) => (
-                                            <li key={idx} className="flex items-start mb-1">
-                                                <i className="fas fa-times text-red-400 mr-2 mt-1 text-xs"></i>{con}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="mb-4 p-3 bg-gray-800 rounded">
-                            <h4 className="text-yellow-400 font-semibold mb-2">
-                                <i className="fas fa-lightbulb mr-2"></i>Pro Tips:
-                            </h4>
-                            <p className="text-sm text-gray-300">{platform.tips}</p>
-                        </div>
-                    </div>
-                    <div className="flex flex-col gap-3 mt-auto pt-4 border-t border-gray-700/50">
-                        <div className="text-xs text-gray-400">
-                            <strong>Requirements:</strong> {platform.requirements}
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                            <a href={platform.url} target="_blank" rel="noopener noreferrer" className="glowing-btn text-sm" style={{ '--glow-color': 'var(--glow-color-blue)' }}>
-                                <i className="fas fa-external-link-alt mr-2"></i>Apply Now
-                            </a>
-                            {platform.trustpilot && (
-                                <a href={platform.trustpilot} target="_blank" rel="noopener noreferrer" className="glowing-btn text-sm" style={{ '--glow-color': 'hsl(50, 100%, 70%)' }}>
-                                    <i className="fas fa-star mr-2"></i>Reviews
-                                </a>
-                            )}
+                        <div className="flex gap-4">
+                            <button onClick={() => setCompareList([])} className="glowing-btn text-sm" style={{'--glow-color': 'hsl(0, 80%, 70%)'}}>
+                                <i className="fas fa-trash mr-2"></i>Clear
+                            </button>
+                            <button 
+                                onClick={() => setActiveSection('compare')} 
+                                disabled={compareList.length < 2}
+                                className="glowing-btn text-sm disabled:opacity-50 disabled:cursor-not-allowed" 
+                                style={{'--glow-color': 'hsl(140, 100%, 70%)'}}>
+                                <i className="fas fa-balance-scale mr-2"></i>Compare ({compareList.length})
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -623,10 +762,10 @@
                                     Your ultimate destination for thoroughly vetted remote work opportunities with verified payment proofs and comprehensive quality research
                                 </p>
                                 <div className="flex flex-col md:flex-row gap-4 justify-center">
-                                    <button onClick={() => setActiveSection('payment-proofs')} className="glowing-btn text-lg px-8 py-4" style={{ '--glow-color': 'hsl(140, 100%, 70%)' }}>
+                                    <button onClick={() => handleNavigation('payment-proofs')} className="glowing-btn text-lg px-8 py-4" style={{ '--glow-color': 'hsl(140, 100%, 70%)' }}>
                                         <i className="fas fa-receipt mr-2"></i>View Payment Proofs
                                     </button>
-                                    <button onClick={() => setActiveSection('categories')} className="glowing-btn text-lg px-8 py-4" style={{ '--glow-color': 'hsl(220, 100%, 70%)' }}>
+                                    <button onClick={() => handleNavigation('categories')} className="glowing-btn text-lg px-8 py-4" style={{ '--glow-color': 'hsl(220, 100%, 70%)' }}>
                                         <i className="fas fa-search mr-2"></i>Browse Categories
                                     </button>
                                 </div>
@@ -773,7 +912,7 @@
                 if (activeSection === 'privacy-policy') {
                     return (
                         <div className="max-w-4xl mx-auto text-gray-300 prose prose-invert prose-lg">
-                            <button onClick={() => setActiveSection('home')} className="glowing-btn mb-8" style={{'--glow-color': 'var(--glow-color-blue)'}}>
+                            <button onClick={() => handleNavigation('home')} className="glowing-btn mb-8" style={{'--glow-color': 'var(--glow-color-blue)'}}>
                                 <i className="fas fa-arrow-left mr-2"></i>Back to Home
                             </button>
                             <h1 className="text-4xl font-bold mb-6 text-blue-400">Privacy Policy</h1>
@@ -813,7 +952,7 @@
                 if (activeSection === 'terms-of-service') {
                     return (
                         <div className="max-w-4xl mx-auto text-gray-300 prose prose-invert prose-lg">
-                            <button onClick={() => setActiveSection('home')} className="glowing-btn mb-8" style={{'--glow-color': 'var(--glow-color-blue)'}}>
+                            <button onClick={() => handleNavigation('home')} className="glowing-btn mb-8" style={{'--glow-color': 'var(--glow-color-blue)'}}>
                                 <i className="fas fa-arrow-left mr-2"></i>Back to Home
                             </button>
                             <h1 className="text-4xl font-bold mb-6 text-blue-400">Terms of Service</h1>
@@ -850,6 +989,69 @@
                         </div>
                     );
                 }
+                
+                if (activeSection === 'compare') {
+                    const features = [
+                        { key: 'rating', label: 'Rating', icon: 'fas fa-star' },
+                        { key: 'payRate', label: 'Pay Rate', icon: 'fas fa-dollar-sign' },
+                        { key: 'difficulty', label: 'Difficulty', icon: 'fas fa-tasks' },
+                        { key: 'minCashout', label: 'Min Cashout', icon: 'fas fa-money-bill-wave' },
+                        { key: 'timeCommitment', label: 'Time Commitment', icon: 'fas fa-clock' },
+                        { key: 'paymentMethods', label: 'Payment Methods', icon: 'fas fa-credit-card' },
+                        { key: 'requirements', label: 'Requirements', icon: 'fas fa-check-circle' },
+                        { key: 'pros', label: 'Pros', icon: 'fas fa-thumbs-up' },
+                        { key: 'cons', label: 'Cons', icon: 'fas fa-thumbs-down' }
+                    ];
+            
+                    return (
+                        <div>
+                            <button onClick={() => setActiveSection(lastActiveSection)} className="glowing-btn mb-8" style={{'--glow-color': 'var(--glow-color-blue)'}}>
+                                <i className="fas fa-arrow-left mr-2"></i>Back
+                            </button>
+                            <h1 className="text-4xl md:text-5xl font-bold text-center mb-12 bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent">Platform Comparison</h1>
+                            <div className="overflow-x-auto">
+                                <div className="comparison-grid" style={{ gridTemplateColumns: `180px repeat(${compareList.length}, 1fr)` }}>
+                                    {/* Header Row */}
+                                    <div className="comparison-cell header-cell">Feature</div>
+                                    {compareList.map(platform => (
+                                        <div key={platform.name} className="comparison-cell header-cell text-center">
+                                            <h2 className="text-2xl font-bold">{platform.name}</h2>
+                                        </div>
+                                    ))}
+            
+                                    {/* Feature Rows */}
+                                    {features.map(feature => (
+                                        <React.Fragment key={feature.key}>
+                                            <div className="comparison-cell label-cell">
+                                                <i className={`${feature.icon} mr-3`}></i>{feature.label}
+                                            </div>
+                                            {compareList.map(platform => (
+                                                <div key={`${platform.name}-${feature.key}`} className="comparison-cell">
+                                                    {renderComparisonData(platform, feature.key)}
+                                                </div>
+                                            ))}
+                                        </React.Fragment>
+                                    ))}
+            
+                                    {/* Actions Row */}
+                                    <div className="comparison-cell label-cell"><i className="fas fa-cogs mr-3"></i>Actions</div>
+                                    {compareList.map(platform => (
+                                        <div key={`${platform.name}-actions`} className="comparison-cell items-center">
+                                            <a href={platform.url} target="_blank" rel="noopener noreferrer" className="glowing-btn text-sm w-full mb-2 text-center" style={{ '--glow-color': 'var(--glow-color-blue)' }}>
+                                                <i className="fas fa-external-link-alt mr-2"></i>Apply Now
+                                            </a>
+                                            {platform.trustpilot && (
+                                                <a href={platform.trustpilot} target="_blank" rel="noopener noreferrer" className="glowing-btn text-sm w-full text-center" style={{ '--glow-color': 'hsl(50, 100%, 70%)' }}>
+                                                    <i className="fas fa-star mr-2"></i>Reviews
+                                                </a>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    );
+                }
 
                 if (currentCategory) {
                     return (
@@ -871,7 +1073,7 @@
                                         </p>
                                     </div>
                                 )}
-                                <button onClick={() => setActiveSection('categories')} className="glowing-btn mb-8" style={{ '--glow-color': currentCategory.color }}>
+                                <button onClick={() => handleNavigation('categories')} className="glowing-btn mb-8" style={{ '--glow-color': currentCategory.color }}>
                                     <i className="fas fa-arrow-left mr-2"></i>Back to Categories
                                 </button>
                             </div>
@@ -924,17 +1126,17 @@
                     <nav className="sticky top-0 z-50 bg-gray-900 bg-opacity-95 backdrop-blur-sm border-b border-gray-700" style={{ position: 'relative' }}>
                         <div className="container mx-auto px-4 py-4">
                             <div className="flex flex-wrap items-center justify-between">
-                                <div className="text-2xl font-bold cursor-pointer" onClick={() => setActiveSection('home')}>
+                                <div className="text-2xl font-bold cursor-pointer" onClick={() => handleNavigation('home')}>
                                     <i className="fas fa-laptop-house text-blue-400 mr-2"></i>RemoteHub2025
                                 </div>
                                 <div className="flex flex-wrap items-center gap-4">
-                                    <span className={`nav-item ${activeSection === 'home' ? 'active' : ''}`} onClick={() => setActiveSection('home')}>
+                                    <span className={`nav-item ${activeSection === 'home' ? 'active' : ''}`} onClick={() => handleNavigation('home')}>
                                         <i className="fas fa-home mr-2"></i>Home
                                     </span>
-                                    <span className={`nav-item ${activeSection === 'payment-proofs' ? 'active' : ''}`} onClick={() => setActiveSection('payment-proofs')}>
+                                    <span className={`nav-item ${activeSection === 'payment-proofs' ? 'active' : ''}`} onClick={() => handleNavigation('payment-proofs')}>
                                         <i className="fas fa-receipt mr-2"></i>Payment Proofs
                                     </span>
-                                    <span className={`nav-item ${activeSection === 'categories' || categories.some(c => c.id === activeSection) ? 'active' : ''}`} onClick={() => setActiveSection('categories')}>
+                                    <span className={`nav-item ${activeSection === 'categories' || categories.some(c => c.id === activeSection) ? 'active' : ''}`} onClick={() => handleNavigation('categories')}>
                                         <i className="fas fa-th-large mr-2"></i>Categories
                                     </span>
                                 </div>
@@ -954,10 +1156,10 @@
                                     All platforms have been thoroughly researched and verified across multiple review sources. Only high-quality, trusted platforms with verified payment records are included.
                                 </p>
                                 <div className="flex flex-col md:flex-row gap-4 justify-center mb-8">
-                                    <button onClick={() => setActiveSection('gpt-microtask')} className="glowing-btn" style={{ '--glow-color': 'hsl(50, 100%, 70%)' }}>
+                                    <button onClick={() => handleNavigation('gpt-microtask')} className="glowing-btn" style={{ '--glow-color': 'hsl(50, 100%, 70%)' }}>
                                         Start with GPT Sites
                                     </button>
-                                    <button onClick={() => setActiveSection('passive-income')} className="glowing-btn" style={{ '--glow-color': 'hsl(45, 100%, 70%)' }}>
+                                    <button onClick={() => handleNavigation('passive-income')} className="glowing-btn" style={{ '--glow-color': 'hsl(45, 100%, 70%)' }}>
                                         Try Passive Income
                                     </button>
                                 </div>
@@ -993,8 +1195,8 @@
                             </div>
                             <div className="border-t border-gray-700 pt-8 text-center">
                                 <div className="flex justify-center gap-6 mb-4">
-                                    <span onClick={() => setActiveSection('terms-of-service')} className="text-gray-400 hover:text-white cursor-pointer transition-colors text-sm">Terms of Service</span>
-                                    <span onClick={() => setActiveSection('privacy-policy')} className="text-gray-400 hover:text-white cursor-pointer transition-colors text-sm">Privacy Policy</span>
+                                    <span onClick={() => handleNavigation('terms-of-service')} className="text-gray-400 hover:text-white cursor-pointer transition-colors text-sm">Terms of Service</span>
+                                    <span onClick={() => handleNavigation('privacy-policy')} className="text-gray-400 hover:text-white cursor-pointer transition-colors text-sm">Privacy Policy</span>
                                 </div>
                                 <p className="text-gray-400 mb-2">
                                     © 2025 Remote Work Hub. All platforms thoroughly researched and verified across multiple review sources.
@@ -1021,6 +1223,7 @@
                             </div>
                         </div>
                     </footer>
+                    {currentCategory && <CompareBar />}
                 </div>
             );
         };
@@ -1028,15 +1231,6 @@
         const container = document.getElementById('root');
         const root = ReactDOM.createRoot(container);
         root.render(<App />);
-    </script>
-    <script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
-    <script>
-      kofiWidgetOverlay.draw('sammarkey', {
-        'type': 'floating-chat',
-        'floating-chat.donateButton.text': 'Support me',
-        'floating-chat.donateButton.background-color': '#00b9fe',
-        'floating-chat.donateButton.text-color': '#fff'
-      });
     </script>
 </body>
 </html>
