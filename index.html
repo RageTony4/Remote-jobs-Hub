@@ -201,6 +201,11 @@
                 minRating: 3.5
             });
 
+            // Scroll to top on section change
+            useEffect(() => {
+                window.scrollTo(0, 0);
+            }, [activeSection]);
+
             // STATIC DATA - Updated with new platforms and removed low-rated ones
             const paymentProofSites = [
                 // Top Survey/GPT Sites - Updated (removed low-rated platforms)
@@ -1028,15 +1033,6 @@
         const container = document.getElementById('root');
         const root = ReactDOM.createRoot(container);
         root.render(<App />);
-    </script>
-    <script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
-    <script>
-      kofiWidgetOverlay.draw('sammarkey', {
-        'type': 'floating-chat',
-        'floating-chat.donateButton.text': 'Support me',
-        'floating-chat.donateButton.background-color': '#00b9fe',
-        'floating-chat.donateButton.text-color': '#fff'
-      });
     </script>
 </body>
 </html>
