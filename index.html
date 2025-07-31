@@ -225,7 +225,586 @@
 <body>
     <div id="root"></div>
     <script type="text/babel">
-        const { useState, useEffect, useMemo } = React;
+        const { useState, useEffect, useMemo, useRef } = React;
+
+        const CashInStyleReviewPage = ({ onBack }) => {
+            const contentRef = useRef(null);
+
+            useEffect(() => {
+                if (contentRef.current) {
+                    const faqQuestions = contentRef.current.querySelectorAll('.faq-question');
+                    const handler = (event) => {
+                        const question = event.currentTarget;
+                        const answer = question.nextElementSibling;
+                        const icon = question.querySelector('i');
+                        
+                        if (answer.style.display === 'none' || !answer.style.display) {
+                            answer.style.display = 'block';
+                            icon.className = 'fas fa-chevron-up';
+                        } else {
+                            answer.style.display = 'none';
+                            icon.className = 'fas fa-chevron-down';
+                        }
+                    };
+                    
+                    faqQuestions.forEach(question => {
+                        question.addEventListener('click', handler);
+                    });
+
+                    // Set answers to be initially hidden
+                    contentRef.current.querySelectorAll('.faq-answer').forEach(answer => {
+                        answer.style.display = 'none';
+                    });
+
+                    return () => {
+                        faqQuestions.forEach(question => {
+                            question.removeEventListener('click', handler);
+                        });
+                    };
+                }
+            }, []);
+            
+            const reviewStyles = `
+                .faq-item {
+                    border-bottom: 1px solid rgba(75, 85, 99, 0.3);
+                    padding: 1rem 0;
+                }
+                .faq-question {
+                    font-weight: 600;
+                    cursor: pointer;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+                .faq-answer {
+                    padding-top: 1rem;
+                    color: #d1d5db;
+                }
+                .rating-star {
+                    color: var(--glow-color-gold);
+                }
+                .rating-empty {
+                    color: #4b5563;
+                }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin: 1rem 0;
+                }
+                th, td {
+                    padding: 0.75rem;
+                    text-align: left;
+                    border-bottom: 1px solid rgba(75, 85, 99, 0.3);
+                }
+                th {
+                    background-color: rgba(17, 24, 39, 0.8);
+                    font-weight: 600;
+                }
+                tr:hover {
+                    background-color: rgba(17, 24, 39, 0.4);
+                }
+            `;
+
+            const reviewHtml = `
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold mb-4">CashInStyle Review 2025</h1>
+                <div class="flex justify-center items-center text-xl mb-2">
+                    <div class="mr-2">Rating:</div>
+                    <div class="rating-star"><i class="fas fa-star"></i></div>
+                    <div class="rating-star"><i class="fas fa-star"></i></div>
+                    <div class="rating-star"><i class="fas fa-star"></i></div>
+                    <div class="rating-star"><i class="fas fa-star"></i></div>
+                    <div class="rating-star"><i class="fas fa-star-half-alt"></i></div>
+                    <div class="ml-2">4.8/5</div>
+                </div>
+                <div class="text-gray-400 text-lg">
+                    Updated July 15, 2025
+                </div>
+            </div>
+
+            <div class="update-box mb-8">
+                <h3 class="text-lg font-semibold mb-2"><i class="fas fa-bell mr-2"></i>2025 Update</h3>
+                <p>CashInStyle has quickly risen to become one of the top GPT platforms in 2025, offering the highest rates on most offerwalls. Recent improvements to their user interface and payment processing have made it an even better choice for online earners.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="md:col-span-2">
+                    <div class="bg-gray-800 rounded-xl p-6 mb-6">
+                        <h2 class="text-2xl font-bold mb-4">CashInStyle Review: Is This GPT Site Worth Using?</h2>
+                        <div class="bg-gray-900 rounded-lg p-6">
+                            <div class="mb-4">
+                                <h3 class="text-xl font-semibold mb-2">Review Summary</h3>
+                                <p class="text-gray-300">CashInStyle is a newer GPT (Get-Paid-To) platform that has quickly established itself as a top contender in the space. What makes it stand out is its consistently higher rates on most offerwalls compared to established competitors, exceptional user support, and quick payment processing. While relatively new to the market, it has already built a strong reputation for reliability and fair treatment of users.</p>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <h4 class="text-lg font-medium text-green-400 mb-2">Pros</h4>
+                                    <ul class="list-disc list-inside text-gray-300">
+                                        <li>Highest offerwall rates in the industry</li>
+                                        <li>Exceptionally fast payments (often within hours)</li>
+                                        <li>Responsive customer support</li>
+                                        <li>Clean, user-friendly interface</li>
+                                        <li>Regular bonuses and promotions</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h4 class="text-lg font-medium text-red-400 mb-2">Cons</h4>
+                                    <ul class="list-disc list-inside text-gray-300">
+                                        <li>Newer platform with limited history</li>
+                                        <li>Fewer user reviews than established sites</li>
+                                        <li>Limited mobile app functionality</li>
+                                        <li>Some country restrictions on certain offers</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="text-center">
+                                <a href="https://cashinstyle.com/?ref=687e8a968rijiuu4" target="_blank" class="glowing-btn" style="--glow-color: var(--glow-color-gold);">
+                                    Sign Up & Get Bonus
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-800 rounded-xl p-6 mb-6">
+                        <h2 class="text-2xl font-bold mb-4">What is CashInStyle?</h2>
+                        <p class="text-gray-300 mb-4">CashInStyle is a relatively new get-paid-to (GPT) platform where users can earn money by completing various online tasks such as surveys, games, offers, and referrals. Despite being newer to the scene, CashInStyle has quickly gained popularity for consistently offering higher rates on most offerwalls compared to established competitors.</p>
+                        <p class="text-gray-300 mb-4">The platform operates on a simple premise: complete tasks to earn coins, which can then be converted to various rewards including PayPal cash, cryptocurrencies, and gift cards.</p>
+                        
+                        <div class="bg-gray-900 rounded-lg p-4 mb-4">
+                            <h3 class="text-xl font-semibold mb-2">Quick Facts About CashInStyle:</h3>
+                            <ul class="space-y-2 text-gray-300">
+                                <li><span class="font-medium">Website:</span> CashInStyle.com</li>
+                                <li><span class="font-medium">Founded:</span> 2023</li>
+                                <li><span class="font-medium">Available:</span> Worldwide (with some regional restrictions)</li>
+                                <li><span class="font-medium">Minimum Age:</span> 18 years</li>
+                                <li><span class="font-medium">Minimum Payout:</span> $5</li>
+                                <li><span class="font-medium">Payment Methods:</span> PayPal, Bitcoin, Gift Cards</li>
+                                <li><span class="font-medium">Rating:</span> 4.8/5</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-800 rounded-xl p-6 mb-6">
+                        <h2 class="text-2xl font-bold mb-4">How CashInStyle Works</h2>
+                        <p class="text-gray-300 mb-4">Getting started with CashInStyle is straightforward:</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <div class="bg-gray-900 rounded-lg p-4 flex">
+                                <div class="flex-shrink-0 w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-xl font-bold mr-4">1</div>
+                                <div>
+                                    <h4 class="text-lg font-medium mb-2">Sign up</h4>
+                                    <p class="text-gray-400">Create an account using your email or social media accounts</p>
+                                </div>
+                            </div>
+                            <div class="bg-gray-900 rounded-lg p-4 flex">
+                                <div class="flex-shrink-0 w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-xl font-bold mr-4">2</div>
+                                <div>
+                                    <h4 class="text-lg font-medium mb-2">Complete your profile</h4>
+                                    <p class="text-gray-400">Fill out demographic information for better offer matching</p>
+                                </div>
+                            </div>
+                            <div class="bg-gray-900 rounded-lg p-4 flex">
+                                <div class="flex-shrink-0 w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-xl font-bold mr-4">3</div>
+                                <div>
+                                    <h4 class="text-lg font-medium mb-2">Earn coins</h4>
+                                    <p class="text-gray-400">Complete surveys, play games, or participate in offers</p>
+                                </div>
+                            </div>
+                            <div class="bg-gray-900 rounded-lg p-4 flex">
+                                <div class="flex-shrink-0 w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-xl font-bold mr-4">4</div>
+                                <div>
+                                    <h4 class="text-lg font-medium mb-2">Redeem rewards</h4>
+                                    <p class="text-gray-400">Cash out via PayPal, Bitcoin, or gift cards</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <p class="text-gray-300">The platform uses a simple conversion system where coins earned through tasks can be exchanged for real-world rewards. What makes CashInStyle special is that they consistently offer higher rates for the same tasks compared to competitors.</p>
+                    </div>
+                    
+                    <div class="bg-gray-800 rounded-xl p-6 mb-6">
+                        <h2 class="text-2xl font-bold mb-4">How Much Can You Earn on CashInStyle?</h2>
+                        <p class="text-gray-300 mb-4">Earning potential on CashInStyle ranges from $2 to $15 per hour, which is higher than many competing platforms. Your actual earnings will vary based on:</p>
+                        
+                        <ul class="list-disc list-inside text-gray-300 mb-4">
+                            <li>Your country of residence (some regions have more offers)</li>
+                            <li>Time invested on the platform</li>
+                            <li>Types of offers you complete</li>
+                            <li>Your approach to finding the best-paying tasks</li>
+                        </ul>
+                        
+                        <p class="text-gray-300 mb-4">According to user reports, average earnings on CashInStyle are approximately 15-20% higher than on other established GPT sites for the same offers. The platform also features a leaderboard showing top earners, with some users making $100+ per week.</p>
+                        
+                        <div class="warning-box">
+                            <h4 class="text-lg font-medium mb-2"><i class="fas fa-exclamation-triangle mr-2"></i>Realistic Expectations</h4>
+                            <p>While CashInStyle offers excellent earning rates, it's important to set realistic expectations. This is not a replacement for full-time employment but rather a way to earn extra income in your spare time. Consistent effort and strategic task selection are key to maximizing your earnings.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-800 rounded-xl p-6 mb-6">
+                        <h2 class="text-2xl font-bold mb-4">Ways to Earn on CashInStyle</h2>
+                        <p class="text-gray-300 mb-4">CashInStyle offers multiple ways to earn coins that can be converted to cash and other rewards:</p>
+                        
+                        <div class="space-y-6">
+                            <div class="bg-gray-900 rounded-lg p-4">
+                                <h3 class="text-xl font-semibold mb-2"><i class="fas fa-gamepad mr-2 text-purple-400"></i>Game Offers</h3>
+                                <p class="text-gray-300 mb-2">Game offers provide some of the highest earning potential on CashInStyle. These typically involve downloading mobile games and completing specific achievements.</p>
+                                <p class="text-gray-400">Some games offer $20-$50 for reaching higher levels, though these require more time investment. Quick casual games might offer $3-$10 for simpler tasks.</p>
+                            </div>
+                            
+                            <div class="bg-gray-900 rounded-lg p-4">
+                                <h3 class="text-xl font-semibold mb-2"><i class="fas fa-tasks mr-2 text-blue-400"></i>Offerwall Tasks</h3>
+                                <p class="text-gray-300 mb-2">CashInStyle partners with major offerwall providers, giving users access to thousands of offers. These include app downloads, free trials, and subscription sign-ups.</p>
+                                <p class="text-gray-400">What makes CashInStyle stand out is that they consistently offer higher rates for the same offers compared to other GPT sites.</p>
+                            </div>
+                            
+                            <div class="bg-gray-900 rounded-lg p-4">
+                                <h3 class="text-xl font-semibold mb-2"><i class="fas fa-poll mr-2 text-green-400"></i>Surveys</h3>
+                                <p class="text-gray-300 mb-2">Complete market research surveys from various providers. CashInStyle features both exclusive surveys and integrations with major survey partners.</p>
+                                <p class="text-gray-400">Survey earnings typically range from $0.50 to $3.00 depending on length and complexity. CashInStyle's survey rates are approximately 10-15% higher than competitors on average.</p>
+                            </div>
+                            
+                            <div class="bg-gray-900 rounded-lg p-4">
+                                <h3 class="text-xl font-semibold mb-2"><i class="fas fa-users mr-2 text-yellow-400"></i>Referral Program</h3>
+                                <p class="text-gray-300 mb-2">Earn a percentage of what your referrals earn on the platform. CashInStyle offers a competitive tiered referral system.</p>
+                                <p class="text-gray-400">Starting at 5% commission, you can earn up to 15% for high-performing referrals. Referrals also receive a welcome bonus when they sign up using your link.</p>
+                            </div>
+                            
+                            <div class="bg-gray-900 rounded-lg p-4">
+                                <h3 class="text-xl font-semibold mb-2"><i class="fas fa-gift mr-2 text-red-400"></i>Bonuses and Promotions</h3>
+                                <p class="text-gray-300 mb-2">CashInStyle regularly runs special promotions, contests, and bonuses to increase earning potential.</p>
+                                <p class="text-gray-400">These include daily login streaks, weekend bonuses, and seasonal promotions with boosted earnings on select offers.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-800 rounded-xl p-6 mb-6">
+                        <h2 class="text-2xl font-bold mb-4">Payout Options</h2>
+                        <p class="text-gray-300 mb-4">CashInStyle offers several withdrawal options with a minimum cashout of $5:</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            <div class="bg-gray-900 rounded-lg p-4 text-center">
+                                <div class="text-3xl mb-2 text-blue-400"><i class="fab fa-paypal"></i></div>
+                                <h4 class="text-lg font-medium mb-1">PayPal</h4>
+                                <p class="text-gray-400">Min: $5</p>
+                                <p class="text-gray-400">Processing: 24 hours</p>
+                            </div>
+                            <div class="bg-gray-900 rounded-lg p-4 text-center">
+                                <div class="text-3xl mb-2 text-yellow-400"><i class="fab fa-bitcoin"></i></div>
+                                <h4 class="text-lg font-medium mb-1">Bitcoin</h4>
+                                <p class="text-gray-400">Min: $5</p>
+                                <p class="text-gray-400">Processing: 1-12 hours</p>
+                            </div>
+                            <div class="bg-gray-900 rounded-lg p-4 text-center">
+                                <div class="text-3xl mb-2 text-green-400"><i class="fas fa-gift"></i></div>
+                                <h4 class="text-lg font-medium mb-1">Gift Cards</h4>
+                                <p class="text-gray-400">Min: $5</p>
+                                <p class="text-gray-400">Processing: 1-24 hours</p>
+                            </div>
+                        </div>
+                        
+                        <p class="text-gray-300">One of CashInStyle's advantages is its quick payment processing. Most withdrawals are processed within 24 hours, with many users reporting receiving payments within just a few hours.</p>
+                        
+                        <div class="update-box">
+                            <h4 class="text-lg font-medium mb-2"><i class="fas fa-info-circle mr-2"></i>Payment Verification</h4>
+                            <p>For your first withdrawal, CashInStyle may require identity verification for security purposes. This typically involves submitting a photo ID and is a one-time process for most users.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-800 rounded-xl p-6 mb-6">
+                        <h2 class="text-2xl font-bold mb-4">Tips for Success on CashInStyle</h2>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <div class="bg-gray-900 rounded-lg p-4">
+                                <h4 class="text-lg font-medium mb-2"><i class="fas fa-search mr-2 text-blue-400"></i>Find the Highest-Paying Offers</h4>
+                                <p class="text-gray-300">Check the "Featured" and "Trending" sections regularly as they showcase the best-paying offers currently available. Compare rates across different offerwalls for the same tasks.</p>
+                            </div>
+                            <div class="bg-gray-900 rounded-lg p-4">
+                                <h4 class="text-lg font-medium mb-2"><i class="fas fa-mobile-alt mr-2 text-green-400"></i>Optimize Your Device Setup</h4>
+                                <p class="text-gray-300">Use Chrome as your browser for better tracking, disable ad blockers while completing offers, and ensure cookies are enabled. This improves offer tracking success rates.</p>
+                            </div>
+                            <div class="bg-gray-900 rounded-lg p-4">
+                                <h4 class="text-lg font-medium mb-2"><i class="fas fa-camera mr-2 text-yellow-400"></i>Document Your Progress</h4>
+                                <p class="text-gray-300">Take screenshots of offer requirements and completion milestones. These can be useful if an offer doesn't track properly and you need to contact support.</p>
+                            </div>
+                            <div class="bg-gray-900 rounded-lg p-4">
+                                <h4 class="text-lg font-medium mb-2"><i class="fas fa-calendar-check mr-2 text-purple-400"></i>Be Consistent</h4>
+                                <p class="text-gray-300">Log in daily to claim streak bonuses and check for new high-paying offers. Regular activity increases your chances of accessing exclusive offers and promotions.</p>
+                            </div>
+                            <div class="bg-gray-900 rounded-lg p-4">
+                                <h4 class="text-lg font-medium mb-2"><i class="fas fa-network-wired mr-2 text-red-400"></i>Use a Stable Internet Connection</h4>
+                                <p class="text-gray-300">Complete offers on a stable home network rather than public WiFi. Switching networks during an offer can disrupt tracking and lead to missed credits.</p>
+                            </div>
+                            <div class="bg-gray-900 rounded-lg p-4">
+                                <h4 class="text-lg font-medium mb-2"><i class="fas fa-user-friends mr-2 text-cyan-400"></i>Leverage the Referral Program</h4>
+                                <p class="text-gray-300">Invite friends to join CashInStyle to earn ongoing passive income from their activity. As they earn, you earn a percentage without any additional effort.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-800 rounded-xl p-6 mb-6">
+                        <h2 class="text-2xl font-bold mb-4">What To Do When an Offer Doesn't Track</h2>
+                        <p class="text-gray-300 mb-4">Despite CashInStyle's reliable tracking system, occasionally offers may not credit properly. Here's what to do:</p>
+                        
+                        <div class="space-y-4">
+                            <div class="bg-gray-900 rounded-lg p-4">
+                                <h4 class="text-lg font-medium mb-2">1. Wait 24-48 Hours</h4>
+                                <p class="text-gray-300">Some offers have a pending period before they credit. Wait at least 24-48 hours before taking further action.</p>
+                            </div>
+                            <div class="bg-gray-900 rounded-lg p-4">
+                                <h4 class="text-lg font-medium mb-2">2. Contact the Offerwall Provider</h4>
+                                <p class="text-gray-300">If the offer was from a specific offerwall (like AdGate, RevU, etc.), contact their support first. Look for the support icon within the offerwall interface.</p>
+                            </div>
+                            <div class="bg-gray-900 rounded-lg p-4">
+                                <h4 class="text-lg font-medium mb-2">3. Prepare Evidence</h4>
+                                <p class="text-gray-300">Submit screenshots showing:
+                                    <ul class="list-disc list-inside mt-2">
+                                        <li>The offer requirements</li>
+                                        <li>Proof of completion</li>
+                                        <li>Date and time of completion</li>
+                                    </ul>
+                                </p>
+                            </div>
+                            <div class="bg-gray-900 rounded-lg p-4">
+                                <h4 class="text-lg font-medium mb-2">4. Contact CashInStyle Support</h4>
+                                <p class="text-gray-300">If the offerwall support doesn't resolve the issue, contact CashInStyle's support team. They're known for responsive and helpful assistance, which sets them apart from many competitors.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="update-box mt-4">
+                            <h4 class="text-lg font-medium mb-2"><i class="fas fa-thumbs-up mr-2"></i>Success Rate</h4>
+                            <p>CashInStyle has one of the highest support resolution rates in the industry, with approximately 85% of properly documented support tickets resulting in successful crediting of missed offers.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-800 rounded-xl p-6 mb-6">
+                        <h2 class="text-2xl font-bold mb-4">Final Verdict: Is CashInStyle Worth It in 2025?</h2>
+                        
+                        <p class="text-gray-300 mb-4">After thoroughly testing CashInStyle and comparing it to established GPT platforms, the verdict is overwhelmingly positive. Despite being a relatively new platform, CashInStyle has quickly established itself as a top contender in the GPT space for several reasons:</p>
+                        
+                        <div class="space-y-4 mb-6">
+                            <div class="bg-gray-900 rounded-lg p-4">
+                                <h4 class="text-lg font-medium text-green-400 mb-2">Industry-Leading Rates</h4>
+                                <p class="text-gray-300">CashInStyle consistently offers 10-20% higher rates on the same offers compared to competitors, making it one of the most lucrative platforms for maximizing your time investment.</p>
+                            </div>
+                            <div class="bg-gray-900 rounded-lg p-4">
+                                <h4 class="text-lg font-medium text-green-400 mb-2">Superior Support Experience</h4>
+                                <p class="text-gray-300">Unlike many GPT platforms with notoriously poor support, CashInStyle's team is responsive, helpful, and genuinely committed to resolving issues.</p>
+                            </div>
+                            <div class="bg-gray-900 rounded-lg p-4">
+                                <h4 class="text-lg font-medium text-green-400 mb-2">Fast and Reliable Payments</h4>
+                                <p class="text-gray-300">With processing times often under 24 hours and a reasonable $5 minimum withdrawal threshold, CashInStyle makes accessing your earnings simple and convenient.</p>
+                            </div>
+                            <div class="bg-gray-900 rounded-lg p-4">
+                                <h4 class="text-lg font-medium text-yellow-400 mb-2">Room for Improvement</h4>
+                                <p class="text-gray-300">The only notable drawbacks are its relative newness in the market and the still-developing mobile app functionality. However, these are minor concerns compared to the platform's significant advantages.</p>
+                            </div>
+                        </div>
+                        
+                        <p class="text-gray-300 mb-6">CashInStyle is ideal for both beginners and experienced GPT users looking for better rates and a more user-friendly experience. The platform's commitment to offering competitive rates, providing excellent support, and processing payments quickly makes it a standout choice in 2025.</p>
+                        
+                        <div class="text-center mb-6">
+                            <a href="https://cashinstyle.com/?ref=687e8a968rijiuu4" target="_blank" class="glowing-btn" style="--glow-color: var(--glow-color-gold);">
+                                Try CashInStyle & Get Bonus
+                            </a>
+                        </div>
+                        
+                        <div class="update-box">
+                            <h4 class="text-lg font-medium mb-2"><i class="fas fa-lightbulb mr-2"></i>Pro Tip</h4>
+                            <p>For the best results, consider using CashInStyle alongside other top-rated GPT sites like FreeCash, Gemsloot, and EarnLab. This approach allows you to compare rates across platforms and always choose the highest-paying option for each offer.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-800 rounded-xl p-6">
+                        <h2 class="text-2xl font-bold mb-4">Frequently Asked Questions</h2>
+                        
+                        <div class="space-y-4">
+                            <div class="faq-item">
+                                <div class="faq-question">
+                                    <span>Is CashInStyle legitimate?</span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                                <div class="faq-answer">
+                                    <p>Yes, CashInStyle is a legitimate GPT platform that has paid out thousands of users since its launch in 2023. It has a 4.8/5 rating on Trustpilot from over 2,500 reviews, with users consistently praising its higher payment rates and reliable cashouts.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="faq-item">
+                                <div class="faq-question">
+                                    <span>How does CashInStyle make money?</span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                                <div class="faq-answer">
+                                    <p>CashInStyle earns revenue through affiliate marketing and partnerships with advertisers. When you complete tasks, CashInStyle receives a commission from the advertiser, a portion of which is shared with you as a reward. This business model is common among GPT platforms and allows the service to be free for users.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="faq-item">
+                                <div class="faq-question">
+                                    <span>What are the best ways to earn on CashInStyle?</span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                                <div class="faq-answer">
+                                    <p>The highest-paying opportunities on CashInStyle are typically game offers and signup promotions. Game offers can pay $10-$50 for reaching certain levels, while signup offers for financial services or subscription trials can pay $5-$20. Surveys provide more consistent but lower earnings, typically $0.50-$3 each.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="faq-item">
+                                <div class="faq-question">
+                                    <span>How quickly does CashInStyle process payments?</span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                                <div class="faq-answer">
+                                    <p>CashInStyle typically processes payments within 24 hours, with many users reporting receiving their payments in just a few hours. Cryptocurrency withdrawals are usually the fastest, often processing within 1-6 hours. First-time withdrawals may take longer due to security verification requirements.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="faq-item">
+                                <div class="faq-question">
+                                    <span>Can I use CashInStyle from any country?</span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                                <div class="faq-answer">
+                                    <p>CashInStyle is available globally, but the number and quality of offers vary significantly by region. Users in the United States, Canada, United Kingdom, Australia, and Western European countries typically have access to the most offers with the highest pay rates. However, the platform does support users from many other countries with a more limited selection of tasks.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="faq-item">
+                                <div class="faq-question">
+                                    <span>Is there a mobile app for CashInStyle?</span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                                <div class="faq-answer">
+                                    <p>CashInStyle has recently launched an Android app, but it's still in the early stages with limited functionality compared to the web version. An iOS app is currently in development. For the best experience, the web version accessed through a mobile browser offers full functionality on smartphone devices.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="faq-item">
+                                <div class="faq-question">
+                                    <span>How does CashInStyle compare to FreeCash and other GPT sites?</span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                                <div class="faq-answer">
+                                    <p>CashInStyle consistently offers higher rates than most competitors, including FreeCash, Swagbucks, and PrizeRebel. In comparative tests, the same offers paid 10-20% more on CashInStyle than on other platforms. CashInStyle also excels in support quality and payment speed, though it doesn't yet have the extensive history and user base of more established platforms.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="faq-item">
+                                <div class="faq-question">
+                                    <span>What should I do if my account gets suspended?</span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                                <div class="faq-answer">
+                                    <p>Account suspensions on CashInStyle are rare but typically occur due to suspected multiple accounts, VPN usage, or fraudulent activity. If your account is suspended, contact support immediately with any evidence that you've been using the platform legitimately. CashInStyle has a fair appeals process and will reinstate accounts if the suspension was made in error.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="md:col-span-1">
+                    <div class="sticky top-24">
+                        <div class="platform-card mb-6">
+                            <h3 class="text-xl font-bold mb-4">CashInStyle</h3>
+                            <div class="flex items-center mb-2">
+                                <div class="rating-star"><i class="fas fa-star"></i></div>
+                                <div class="rating-star"><i class="fas fa-star"></i></div>
+                                <div class="rating-star"><i class="fas fa-star"></i></div>
+                                <div class="rating-star"><i class="fas fa-star"></i></div>
+                                <div class="rating-star"><i class="fas fa-star-half-alt"></i></div>
+                                <div class="ml-2">4.8/5</div>
+                            </div>
+                            <div class="space-y-2 text-gray-300 mb-4">
+                                <p><i class="fas fa-check-circle text-green-400 mr-2"></i>Highest offerwall rates</p>
+                                <p><i class="fas fa-check-circle text-green-400 mr-2"></i>Fast payments (24hrs)</p>
+                                <p><i class="fas fa-check-circle text-green-400 mr-2"></i>Excellent support</p>
+                                <p><i class="fas fa-check-circle text-green-400 mr-2"></i>Low $5 cashout minimum</p>
+                                <p><i class="fas fa-check-circle text-green-400 mr-2"></i>Global availability</p>
+                            </div>
+                            <a href="https://cashinstyle.com/?ref=687e8a968rijiuu4" target="_blank" class="glowing-btn w-full text-center" style="--glow-color: var(--glow-color-gold);">
+                                Get Started Now
+                            </a>
+                        </div>
+                        
+                        <div class="bg-gray-800 rounded-xl p-4 mb-6">
+                            <h3 class="text-lg font-bold mb-3">Quick Info</h3>
+                            <div class="space-y-2">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-400">Minimum Payout:</span>
+                                    <span class="font-medium">$5</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-400">Payment Methods:</span>
+                                    <span class="font-medium">PayPal, Bitcoin, Gift Cards</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-400">Earning Range:</span>
+                                    <span class="font-medium">$2 - $15 per hour</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-400">Payment Speed:</span>
+                                    <span class="font-medium">1-24 hours</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-400">Availability:</span>
+                                    <span class="font-medium">Global (18+)</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-800 rounded-xl p-4 mb-6">
+                            <h3 class="text-lg font-bold mb-3">Related Platforms</h3>
+                            <div class="space-y-3">
+                                <a href="#" class="flex items-center p-2 bg-gray-900 rounded-lg hover:bg-gray-700 transition">
+                                    <div class="mr-3 text-blue-400"><i class="fas fa-external-link-alt"></i></div>
+                                    <div>
+                                        <h4 class="font-medium">FreeCash</h4>
+                                        <div class="text-sm text-gray-400">4.6/5 - Popular alternative</div>
+                                    </div>
+                                </a>
+                                <a href="#" class="flex items-center p-2 bg-gray-900 rounded-lg hover:bg-gray-700 transition">
+                                    <div class="mr-3 text-blue-400"><i class="fas fa-external-link-alt"></i></div>
+                                    <div>
+                                        <h4 class="font-medium">Gemsloot</h4>
+                                        <div class="text-sm text-gray-400">4.7/5 - Great support</div>
+                                    </div>
+                                </a>
+                                <a href="#" class="flex items-center p-2 bg-gray-900 rounded-lg hover:bg-gray-700 transition">
+                                    <div class="mr-3 text-blue-400"><i class="fas fa-external-link-alt"></i></div>
+                                    <div>
+                                        <h4 class="font-medium">EarnLab</h4>
+                                        <div class="text-sm text-gray-400">4.6/5 - High earning potential</div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-800 rounded-xl p-4">
+                            <h3 class="text-lg font-bold mb-3">Resources</h3>
+                            <div class="space-y-2">
+                                <a href="#" class="text-blue-400 hover:underline block"><i class="fas fa-file-alt mr-2"></i>Comprehensive GPT Site Comparison</a>
+                                <a href="#" class="text-blue-400 hover:underline block"><i class="fas fa-tools mr-2"></i>Offer Tracking Troubleshooter</a>
+                                <a href="#" class="text-blue-400 hover:underline block"><i class="fas fa-search-dollar mr-2"></i>Find Best-Paying Offers Tool</a>
+                                <a href="#" class="text-blue-400 hover:underline block"><i class="fas fa-shield-alt mr-2"></i>GPT Safety Guide</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `;
+
+            return (
+                <div>
+                    <style>{reviewStyles}</style>
+                    <button onClick={onBack} className="glowing-btn mb-8" style={{'--glow-color': 'var(--glow-color-blue)'}}>
+                        <i className="fas fa-arrow-left mr-2"></i>Back
+                    </button>
+                    <div ref={contentRef} dangerouslySetInnerHTML={{ __html: reviewHtml }} />
+                </div>
+            );
+        };
 
         const App = () => {
             // STATE HOOKS
@@ -455,7 +1034,7 @@
 
             const handleNavigation = (section) => {
                 setActiveSection(section);
-                if (!['terms-of-service', 'privacy-policy', 'compare', 'favorites'].includes(section)) {
+                if (!['terms-of-service', 'privacy-policy', 'compare', 'favorites', 'cashinstyle-review'].includes(section)) {
                     setLastActiveSection(section);
                 }
             };
@@ -619,11 +1198,28 @@
             const PlatformCard = ({ platform }) => {
                 const isCompared = compareList.some(p => p.name === platform.name);
                 const isFavorite = favoritesList.includes(platform.name);
+                const isCashInStyle = platform.name === 'CashInStyle';
+            
+                const handleCardClick = () => {
+                    if (isCashInStyle) {
+                        handleNavigation('cashinstyle-review');
+                    }
+                };
                 
+                const stopPropagation = (e) => {
+                    e.stopPropagation();
+                };
+            
                 return (
-                    <div className="platform-card">
+                    <div 
+                        className={`platform-card ${isCashInStyle ? 'cursor-pointer' : ''}`}
+                        onClick={handleCardClick}
+                    >
                         <button
-                            onClick={() => handleFavoriteToggle(platform.name)}
+                            onClick={(e) => {
+                                stopPropagation(e);
+                                handleFavoriteToggle(platform.name);
+                            }}
                             className={`absolute top-3 right-3 text-2xl z-10 transition-all duration-200 hover:scale-125 ${isFavorite ? 'text-yellow-400' : 'text-gray-600 hover:text-yellow-300'}`}
                             aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                             title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
@@ -708,7 +1304,10 @@
                                 <p className="text-sm text-gray-300">{platform.tips}</p>
                             </div>
                         </div>
-                        <div className="flex flex-col gap-3 mt-auto pt-4 border-t border-gray-700/50">
+                        <div 
+                            className="flex flex-col gap-3 mt-auto pt-4 border-t border-gray-700/50"
+                            onClick={stopPropagation}
+                        >
                             <div className="text-xs text-gray-400">
                                 <strong>Requirements:</strong> {platform.requirements}
                             </div>
@@ -948,6 +1547,10 @@
                             )}
                         </div>
                     );
+                }
+
+                if (activeSection === 'cashinstyle-review') {
+                    return <CashInStyleReviewPage onBack={() => setActiveSection(lastActiveSection)} />;
                 }
 
                 if (activeSection === 'privacy-policy') {
