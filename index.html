@@ -501,6 +501,7 @@
                 minRating: 3.5
             });
             const [filters, setFilters] = useState({
+                searchTerm: '',
                 paymentMethod: 'all',
                 region: 'all',
                 maxCashout: 100,
@@ -789,13 +790,14 @@
             const filteredPlatforms = useMemo(() => {
                 if (!currentPlatforms.length) return [];
                 return currentPlatforms.filter(platform => {
+                    const nameMatch = platform.name.toLowerCase().includes(filters.searchTerm.toLowerCase());
                     const paymentMatch = filters.paymentMethod === 'all' || platform.paymentMethods.includes(filters.paymentMethod);
                     const regionMatch = filters.region === 'all' ||
                         (filters.region === 'global' && platform.requirements.toLowerCase().includes('global')) ||
                         (filters.region === 'us-ca' && (platform.requirements.toLowerCase().includes('us') || platform.requirements.toLowerCase().includes('ca')));
                     const cashoutMatch = parseCashout(platform.minCashout) <= filters.maxCashout;
                     const ratingMatch = parseRating(platform.rating) >= filters.minRating;
-                    return paymentMatch && regionMatch && cashoutMatch && ratingMatch;
+                    return nameMatch && paymentMatch && regionMatch && cashoutMatch && ratingMatch;
                 });
             }, [currentPlatforms, filters]);
             
@@ -1436,28 +1438,42 @@
                             </div>
                             
                             <div className="bg-gray-800/50 p-4 rounded-lg mb-8 border border-gray-700">
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
-                                    <div className="w-full">
-                                        <label htmlFor="paymentMethod" className="block text-sm font-medium text-gray-300 mb-1">Payment Method</label>
-                                        <select id="paymentMethod" name="paymentMethod" value={filters.paymentMethod} onChange={handleFilterChange} className="filter-select">
-                                            {paymentMethodOptions.map(method => <option key={method} value={method}>{method === 'all' ? 'All Methods' : method}</option>)}
-                                        </select>
+                                <div className="grid grid-cols-1 gap-4">
+                                    <div>
+                                        <label htmlFor="platformSearch" className="block text-sm font-medium text-gray-300 mb-1">Search by Platform Name</label>
+                                        <input
+                                            id="platformSearch"
+                                            type="text"
+                                            name="searchTerm"
+                                            placeholder="e.g., User Interviews, Rev, etc."
+                                            className="search-input"
+                                            value={filters.searchTerm}
+                                            onChange={handleFilterChange}
+                                        />
                                     </div>
-                                    <div className="w-full">
-                                        <label htmlFor="region" className="block text-sm font-medium text-gray-300 mb-1">Region</label>
-                                        <select id="region" name="region" value={filters.region} onChange={handleFilterChange} className="filter-select">
-                                            <option value="all">All Regions</option>
-                                            <option value="global">Global</option>
-                                            <option value="us-ca">US/Canada Focus</option>
-                                        </select>
-                                    </div>
-                                    <div className="w-full">
-                                        <label htmlFor="maxCashout" className="block text-sm font-medium text-gray-300 mb-1">Max. Min Cashout: <span className="font-bold text-green-400">${filters.maxCashout}</span></label>
-                                        <input type="range" id="maxCashout" name="maxCashout" min="0" max={maxCashoutValue} value={filters.maxCashout} onChange={handleFilterChange} className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer"/>
-                                    </div>
-                                    <div className="w-full">
-                                        <label htmlFor="minRating" className="block text-sm font-medium text-gray-300 mb-1">Min. Rating: <span className="font-bold text-yellow-400">{filters.minRating.toFixed(1)} ★</span></label>
-                                        <input type="range" id="minRating" name="minRating" min="2.5" max="5" step="0.1" value={filters.minRating} onChange={handleFilterChange} className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer"/>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+                                        <div className="w-full">
+                                            <label htmlFor="paymentMethod" className="block text-sm font-medium text-gray-300 mb-1">Payment Method</label>
+                                            <select id="paymentMethod" name="paymentMethod" value={filters.paymentMethod} onChange={handleFilterChange} className="filter-select">
+                                                {paymentMethodOptions.map(method => <option key={method} value={method}>{method === 'all' ? 'All Methods' : method}</option>)}
+                                            </select>
+                                        </div>
+                                        <div className="w-full">
+                                            <label htmlFor="region" className="block text-sm font-medium text-gray-300 mb-1">Region</label>
+                                            <select id="region" name="region" value={filters.region} onChange={handleFilterChange} className="filter-select">
+                                                <option value="all">All Regions</option>
+                                                <option value="global">Global</option>
+                                                <option value="us-ca">US/Canada Focus</option>
+                                            </select>
+                                        </div>
+                                        <div className="w-full">
+                                            <label htmlFor="maxCashout" className="block text-sm font-medium text-gray-300 mb-1">Max. Min Cashout: <span className="font-bold text-green-400">${filters.maxCashout}</span></label>
+                                            <input type="range" id="maxCashout" name="maxCashout" min="0" max={maxCashoutValue} value={filters.maxCashout} onChange={handleFilterChange} className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer"/>
+                                        </div>
+                                        <div className="w-full">
+                                            <label htmlFor="minRating" className="block text-sm font-medium text-gray-300 mb-1">Min. Rating: <span className="font-bold text-yellow-400">{filters.minRating.toFixed(1)} ★</span></label>
+                                            <input type="range" id="minRating" name="minRating" min="2.5" max="5" step="0.1" value={filters.minRating} onChange={handleFilterChange} className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer"/>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
