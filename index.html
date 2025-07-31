@@ -495,6 +495,22 @@
                     return [];
                 }
             });
+            const [platformLikes, setPlatformLikes] = useState(() => {
+                try {
+                    const saved = localStorage.getItem('platformLikes');
+                    return saved ? JSON.parse(saved) : {};
+                } catch (error) {
+                    return {};
+                }
+            });
+            const [userLikes, setUserLikes] = useState(() => {
+                try {
+                    const saved = localStorage.getItem('userLikes');
+                    return saved ? JSON.parse(saved) : [];
+                } catch (error) {
+                    return [];
+                }
+            });
             const [proofFilters, setProofFilters] = useState({
                 searchTerm: '',
                 category: 'all',
@@ -512,6 +528,14 @@
             useEffect(() => {
                 localStorage.setItem('favoritesList', JSON.stringify(favoritesList));
             }, [favoritesList]);
+
+            useEffect(() => {
+                localStorage.setItem('platformLikes', JSON.stringify(platformLikes));
+            }, [platformLikes]);
+
+            useEffect(() => {
+                localStorage.setItem('userLikes', JSON.stringify(userLikes));
+            }, [userLikes]);
             
             // Scroll to top on section change
             useEffect(() => {
@@ -744,6 +768,28 @@
                 });
             };
 
+            const handleLikeToggle = (platformName) => {
+                const isLiked = userLikes.includes(platformName);
+                
+                // Update total likes count
+                setPlatformLikes(prevLikes => {
+                    const currentLikes = prevLikes[platformName] || 0;
+                    return {
+                        ...prevLikes,
+                        [platformName]: isLiked ? Math.max(0, currentLikes - 1) : currentLikes + 1
+                    };
+                });
+
+                // Update user's personal liked list
+                setUserLikes(prevUserLikes => {
+                    if (isLiked) {
+                        return prevUserLikes.filter(name => name !== platformName);
+                    } else {
+                        return [...prevUserLikes, platformName];
+                    }
+                });
+            };
+
             // DERIVED STATE & MEMOIZED VALUES
             const allPlatformsFlat = useMemo(() => Object.values(platforms).flat(), [platforms]);
 
@@ -882,6 +928,9 @@
                 const isCompared = compareList.some(p => p.name === platform.name);
                 const isFavorite = favoritesList.includes(platform.name);
                 const hasReview = !!platformReviews[platform.name];
+
+                const isLikedByUser = userLikes.includes(platform.name);
+                const likeCount = platformLikes[platform.name] || 0;
             
                 const handleCardClick = (e) => {
                     if (hasReview) {
@@ -1006,10 +1055,21 @@
                                         </a>
                                     )}
                                 </div>
-                                <button onClick={() => handleCompareToggle(platform)} className={`glowing-btn text-sm w-full ${isCompared ? 'compared-active' : ''}`} style={{ '--glow-color': isCompared ? 'hsl(100, 100%, 70%)' : 'hsl(200, 100%, 70%)' }}>
-                                    <i className={`fas ${isCompared ? 'fa-check-circle' : 'fa-plus-circle'} mr-2`}></i>
-                                    {isCompared ? 'Added to Compare' : 'Add to Compare'}
-                                </button>
+                                <div className="flex gap-2 w-full">
+                                    <button onClick={() => handleCompareToggle(platform)} className={`glowing-btn text-sm w-full ${isCompared ? 'compared-active' : ''}`} style={{ '--glow-color': isCompared ? 'hsl(100, 100%, 70%)' : 'hsl(200, 100%, 70%)' }}>
+                                        <i className={`fas ${isCompared ? 'fa-check-circle' : 'fa-plus-circle'} mr-2`}></i>
+                                        {isCompared ? 'Added to Compare' : 'Add to Compare'}
+                                    </button>
+                                     <button
+                                        onClick={() => handleLikeToggle(platform.name)}
+                                        className={`glowing-btn text-sm px-4 flex-shrink-0 ${isLikedByUser ? 'text-red-400' : 'text-gray-400'}`}
+                                        style={{ '--glow-color': isLikedByUser ? 'hsl(0, 100%, 70%)' : 'hsl(210, 20%, 70%)' }}
+                                        title={isLikedByUser ? 'Unlike this platform' : 'Like this platform'}
+                                    >
+                                        <i className={`${isLikedByUser ? 'fas' : 'far'} fa-heart mr-2`}></i>
+                                        <span>{likeCount}</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
