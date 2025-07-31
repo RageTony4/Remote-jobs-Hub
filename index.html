@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
@@ -1441,16 +1442,6 @@
                                 <p className="text-xl text-gray-300 max-w-4xl mx-auto mb-8">
                                     Thoroughly vetted platforms for {currentCategory.name.toLowerCase()}. All maintain high quality ratings and have verified payment records from real users.
                                 </p>
-                                {activeSection === 'chat-moderation' && (
-                                     <div className="warning-box max-w-4xl mx-auto">
-                                        <h3 className="text-lg font-bold text-red-400 mb-2"><i className="fas fa-exclamation-triangle mr-2"></i>Important Warning</h3>
-                                        <p className="text-red-300">
-                                            This category involves moderating adult content. Many platforms in this space have questionable business practices, inconsistent payments, and may terminate accounts without notice. 
-                                            We've listed only the most reputable options available based on community verification, but <strong className="font-bold">extreme caution is advised</strong>. 
-                                            Always research recent reviews before investing time.
-                                        </p>
-                                    </div>
-                                )}
                                 <button onClick={() => handleNavigation('categories', false)} className="glowing-btn mb-8" style={{ '--glow-color': currentCategory.color }}>
                                     <i className="fas fa-arrow-left mr-2"></i>Back to Categories
                                 </button>
